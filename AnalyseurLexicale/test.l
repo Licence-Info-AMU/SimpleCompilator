@@ -1,5 +1,5 @@
 f(entier $a, entier $b) 
-entier $c, entier $k;
+entier $c, entier $k; /*bob*/
 {
 	$k = $a + $b;
 	retour $k;

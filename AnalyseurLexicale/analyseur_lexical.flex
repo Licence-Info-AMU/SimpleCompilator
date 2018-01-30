@@ -15,6 +15,10 @@ alphanum {lettre}|{chiffre}
 nom [a-zA-Z0-9_$]*
 
 %%
+"/*".*"*/" ;
+" ";
+"\n";
+"\t";
 ";"              { return POINT_VIRGULE;                 }
 "+"              { return PLUS;                 }
 "-"              { return MOINS;                 }
@@ -46,7 +50,6 @@ ecrire         { return ECRIRE;                 }
 "."              { return FIN;                 }
 ","              { return VIRGULE;                 }
 <<EOF>>        { return FIN;                 }  /* Fin de fichier */
-
 %%
 int yywrap(){
   return 1;
