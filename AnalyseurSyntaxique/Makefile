@@ -5,14 +5,15 @@ LIBS = -lm
 CCFLAGS = -Wall -ggdb
 
 OBJ = analyseur_lexical_flex.o util.o AnalyseurSyntaxique.o
+EXEC = compilateur test_yylex
 
-all: compilateur test_yylex
+all: $(EXEC)
 
 compilateur: AnalyseurSyntaxique.c $(OBJ)
-	$(CC) $(CCFLAGS) -o AnalyseurSyntaxique AnalyseurSyntaxique.c $(OBJ)
+	$(CC) $(CCFLAGS) -o AnalyseurSyntaxique $(OBJ)
 
 test_yylex: test_yylex.c $(OBJ)
-	$(CC) $(CCFLAGS) -o test_yylex test_yylex.c $(OBJ)
+	$(CC) $(CCFLAGS) -o test_yylex $(OBJ)
 
 analyseur_lexical_flex.c: analyseur_lexical.flex
 	$(FLEX) -o $@ $^
@@ -30,5 +31,8 @@ util.o: util.c
 
 clean:
 	- rm -f $(OBJ)
-	- rm -f test_yylex
 	- rm -f analyseur_lexical_flex.c
+	
+distclean: clean
+	rm -f $(EXEC)
+	

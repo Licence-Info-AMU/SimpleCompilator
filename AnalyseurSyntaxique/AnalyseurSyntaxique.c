@@ -2,18 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include "symboles.h"
+#include "AnalyseurSyntaxique.h"
 #include "util.h"
 
 int uniteCourante;
-
 int yylex(void);
 extern char *yytext;
 FILE *yyin;
-
-void etatE_prime();
-void etatT();
-void etatT_prime();
-void etatF();
 
 void etatE(){
 	etatT();
