@@ -7,7 +7,7 @@ CCFLAGS = -Wall -ggdb
 OBJ = analyseur_lexical_flex.o util.o AnalyseurSyntaxique.o
 EXEC = compilateur test_yylex
 
-all: $(EXEC)
+all :: $(EXEC)
 
 compilateur: AnalyseurSyntaxique.c $(OBJ)
 	$(CC) $(CCFLAGS) -o AnalyseurSyntaxique $(OBJ)
@@ -27,12 +27,27 @@ AnalyseurSyntaxique.o: AnalyseurSyntaxique.c
 util.o: util.c
 	$(CC) $(CCFLAGS) -c $^
 
-.PHONY : clean
-
-clean:
+clean ::
 	- rm -f $(OBJ)
 	- rm -f analyseur_lexical_flex.c
 	
-distclean: clean
-	rm -f $(EXEC)
+distclean :: clean
+	- rm -f $(EXEC)
+	
+zip :: distclean
+	@N=$$(pwd) ; N=$$(basename "$$N") ;\
+	(cd .. && zip -r "$$N.zip" "$$N" --exclude='svg*' --exclude='*.tgz' --exclude='*.zip' && \
+	echo "DONE ../$$N.zip")
+
+tar :: distclean
+	@N=$$(pwd) ; N=$$(basename "$$N") ;\
+	(cd .. && tar cvfz "$$N.tgz" "$$N" --exclude='svg*' --exclude='*.tgz' && \
+	 echo "DONE ../$$N.tgz")
+	 
+help ::
+	@ echo "       make all       pour tout compiler"
+	@ echo "       make clean     pour tout nettoyer"
+	@ echo "       make distclean     pour tout nettoyer"
+	@ echo "       make zip       pour tout sauvegarder"
+	@ echo "       make tar       pour tout sauvegarder"
 	
