@@ -44,17 +44,17 @@ void initialise_premiers(void){
 	
 	//OLDV
 	premiers[_optListeDecVariables_][EPSILON] = 1;
-	remiers[_optListeDecVariables_][ENTIER] = 1;
+	premiers[_optListeDecVariables_][ENTIER] = 1;
 	
 	//I
-	premiers[_instruction_][ID_FCT] = 1;
-	premiers[_instruction_][ID_VAR] = 1;
-	premiers[_instruction_][TANTQUE] = 1;	
-	premiers[_instruction_][RETOUR] = 1;
-	premiers[_instruction_][ECRIRE] = 1;
-	premiers[_instruction_][POINT_VIRGULE] = 1;
-	premiers[_instruction_][ACCOLADE_OUVRANTE] = 1;
-	premiers[_instruction_][SI] = 1;
+	premiers[_listeInstructions_][ID_FCT] = 1;
+	premiers[_listeInstructions_][ID_VAR] = 1;
+	premiers[_listeInstructions_][TANTQUE] = 1;	
+	premiers[_listeInstructions_][RETOUR] = 1;
+	premiers[_listeInstructions_][ECRIRE] = 1;
+	premiers[_listeInstructions_][POINT_VIRGULE] = 1;
+	premiers[_listeInstructions_][ACCOLADE_OUVRANTE] = 1;
+	premiers[_listeInstructions_][SI] = 1;
 	
 	//IAFF
 	premiers[_instructionAffect_][ID_VAR] = 1;

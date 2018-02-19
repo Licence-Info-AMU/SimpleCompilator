@@ -12,5 +12,6 @@ void affiche_element(char *fct_, char *texte_, int trace_xml);
 void affiche_texte(char *texte_, int trace_xml);
 void test_yylex_internal(FILE *yyin);
 void nom_token( int token, char *nom, char *valeur );
-
+void affiche_feuille(int uc, int trace_xml);
+void consommer( int c, int *uc, int trace_xml );
 #endif
