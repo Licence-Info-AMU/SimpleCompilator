@@ -1,10 +1,17 @@
 #ifndef __ANALYSEURSYNTAXIQUE__
 #define __ANALYSEURSYNTAXIQUE__
 
-void etatE();
-void etatE_prime();
-void etatT();
-void etatT_prime();
-void etatF();
+int uniteCourante;
+int trace_xml;
+
+int est_premier_uniteCourante(int arg);
+
+int est_suivant_uniteCourante(int arg);
+
+void programme();
+
+void optDecVariables();
+
+void listeDecFonctions();
 
 #endif
