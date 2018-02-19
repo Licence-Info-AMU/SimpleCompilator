@@ -7,7 +7,7 @@ void initialise_premiers(void){
 	// Initialiser toutes les cases du tableau à 0
 	for(i=0; i <= NB_NON_TERMINAUX; i++)
 	for(j=0; j <= NB_TERMINAUX; j++)
-	  premiers[i][j] = 0;
+	premiers[i][j] = 0;
 
 	//PG
 	premiers[_programme_][ENTIER] = 1; 
@@ -47,14 +47,14 @@ void initialise_premiers(void){
 	remiers[_optListeDecVariables_][ENTIER] = 1;
 	
 	//I
-	premiers[_instruction_][ENTIER] = 1;
-	premiers[_instruction_][EPSILON] = 1;
-	premiers[_instruction_][ID_FCT] = 1;
-	premiers[_instruction_][ID_VAR] = 1;
-	premiers[_instruction_][TANTQUE] = 1;
-	premiers[_instruction_][POINT_VIRGULE] = 1;
-	premiers[_instruction_][RETOUR] = 1;
-	premiers[_instruction_][ECRIRE] = 1;
+	premiers[_listeInstructions_][ID_FCT] = 1;
+	premiers[_listeInstructions_][ID_VAR] = 1;
+	premiers[_listeInstructions_][TANTQUE] = 1;	
+	premiers[_listeInstructions_][RETOUR] = 1;
+	premiers[_listeInstructions_][ECRIRE] = 1;
+	premiers[_listeInstructions_][POINT_VIRGULE] = 1;
+	premiers[_listeInstructions_][ACCOLADE_OUVRANTE] = 1;
+	premiers[_listeInstructions_][SI] = 1;
 	
 	//IAFF
 	premiers[_instructionAffect_][ID_VAR] = 1;
@@ -119,6 +119,45 @@ void initialise_premiers(void){
 	premiers[_conjonctionBis_][ET] = 1;
 	premiers[_conjonctionBis_][EPSILON] = 1;
 	
+	//COMP
+	premiers[_comparaison_][NOMBRE] = 1;
+	premiers[_comparaison_][ID_VAR] = 1;
+	premiers[_comparaison_][ID_FCT] = 1;
+	premiers[_comparaison_][LIRE] = 1;
+	premiers[_comparaison_][NON] = 1;
+	premiers[_comparaison_][PARENTHESE_OUVRANTE] = 1;
+	
+	//COMPB
+	premiers[_comparaisonBis_][EGAL] = 1;
+	premiers[_comparaisonBis_][INFERIEUR] = 1;
+	premiers[_comparaisonBis_][EPSILON] = 1;
+
+	//E
+	premiers[_expArith_][NOMBRE] = 1;
+	premiers[_expArith_][ID_VAR] = 1;
+	premiers[_expArith_][ID_FCT] = 1;
+	premiers[_expArith_][LIRE] = 1;
+	premiers[_expArith_][NON] = 1;
+	premiers[_expArith_][PARENTHESE_OUVRANTE] = 1;
+	
+	//EB
+	premiers[_expArithBis_][PLUS] = 1;
+	premiers[_expArithBis_][MOINS] = 1;
+	premiers[_expArithBis_][EPSILON] = 1;
+	
+	//T
+	premiers[_terme_][NOMBRE] = 1;
+	premiers[_terme_][ID_VAR] = 1;
+	premiers[_terme_][ID_FCT] = 1;
+	premiers[_terme_][LIRE] = 1;
+	premiers[_terme_][NON] = 1;
+	premiers[_terme_][PARENTHESE_OUVRANTE] = 1;
+	
+	//TB
+	premiers[_termeBis_][FOIS] = 1;
+	premiers[_termeBis_][DIVISE] = 1;
+	premiers[_termeBis_][EPSILON] = 1;
+
 	//NEG
 	premiers[_negation_][NOMBRE] = 1;
 	premiers[_negation_][ID_VAR] = 1;
@@ -126,20 +165,38 @@ void initialise_premiers(void){
 	premiers[_negation_][LIRE] = 1;
 	premiers[_negation_][NON] = 1;
 	premiers[_negation_][PARENTHESE_OUVRANTE] = 1;
+
+	//F
+	premiers[_facteur_][NOMBRE] = 1;
+	premiers[_facteur_][ID_VAR] = 1;
+	premiers[_facteur_][ID_FCT] = 1;
+	premiers[_facteur_][LIRE] = 1;
+	premiers[_facteur_][PARENTHESE_OUVRANTE] = 1;
 	
-	//COMP
-	premiers[_comparaison_][NOMBRE] = 1;
-	premiers[_comparaison_][ID_VAR] = 1;
-	premiers[_comparaison_][ID_FCT] = 1;
-	premiers[_comparaison_][LIRE] = 1;
-	premiers[_comparaison_][PARENTHESE_OUVRANTE] = 1;
+	//VAR
+	premiers[_var_][ID_VAR] = 1;
 	
-	//COMPB
-	premiers[_conjonctionBis_][EGAL] = 1;
-	premiers[_conjonctionBis_][INFERIEUR] = 1;
-	premiers[_conjonctionBis_][EPSILON] = 1;
+	//OIND
+	premiers[_optIndice_][CROCHET_OUVRANT] = 1;
+	premiers[_optIndice_][EPSILON] = 1;
+	
+	//APPF
+	premiers[_appelFct_][ID_FCT] = 1;
+
+	//LEXP
+	premiers[_listeExpressions_][EPSILON] = 1;
+	premiers[_listeExpressions_][NOMBRE] = 1;
+	premiers[_listeExpressions_][ID_VAR] = 1;
+	premiers[_listeExpressions_][ID_FCT] = 1;
+	premiers[_listeExpressions_][LIRE] = 1;
+	premiers[_listeExpressions_][NON] = 1;
+	premiers[_listeExpressions_][PARENTHESE_OUVRANTE] = 1;
+
+	//LEXPB
+	premiers[_listeExpressionsBis_][VIRGULE] = 1;
+	premiers[_listeExpressionsBis_][EPSILON] = 1;
 }
 
 int est_premier(int terminal, int non_terminal){
-  return premiers[non_terminal][terminal];
+	return premiers[non_terminal][terminal];
 }
