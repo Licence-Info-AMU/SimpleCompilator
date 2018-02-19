@@ -25,6 +25,8 @@ void programme(){										//PG
 	if(est_premier_uniteCourante(_optDecVariables_)){
 		optDecVariables();
 		listeDecFonctions();
+	}else if(est_premier_uniteCourante(_listeDecFonctions_)){
+		listeDecFonctions();
 	}else{
 		erreur((char *) __func__);
 	}
@@ -104,7 +106,7 @@ void listeDecFonctions(){								//LDF
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
 }
 
-void declarationVariable(){								//DF
+void declarationFonction(){								//DF
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==ID_FCT){
 		consommer(ID_FCT,&uniteCourante,trace_xml);
