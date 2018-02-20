@@ -105,6 +105,7 @@ void initialise_premiers(void){
 	//EXPB
 	premiers[_expressionBis_][OU] = 1;
 	premiers[_expressionBis_][EPSILON] = 1;
+	premiers[_expressionBis_][INTERROGATION] = 1;
 	
 	//CONJ
 	premiers[_conjonction_][NOMBRE] = 1;
@@ -124,6 +125,7 @@ void initialise_premiers(void){
 	premiers[_comparaison_][ID_FCT] = 1;
 	premiers[_comparaison_][LIRE] = 1;
 	premiers[_comparaison_][PARENTHESE_OUVRANTE] = 1;
+	premiers[_comparaison_][NON] = 1;
 	
 	//COMPB
 	premiers[_comparaisonBis_][EGAL] = 1;
@@ -135,7 +137,7 @@ void initialise_premiers(void){
 	premiers[_expArith_][ID_VAR] = 1;
 	premiers[_expArith_][ID_FCT] = 1;
 	premiers[_expArith_][LIRE] = 1;
-	//premiers[_expArith_][NON] = 1;
+	premiers[_expArith_][NON] = 1;
 	premiers[_expArith_][PARENTHESE_OUVRANTE] = 1;
 	
 	//EB

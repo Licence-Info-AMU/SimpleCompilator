@@ -306,6 +306,11 @@ void expressionBis(){									//EXPB
 		consommer(OU,&uniteCourante,trace_xml);
 		conjonction();
 		expressionBis();
+	}else if(uniteCourante==INTERROGATION){
+		consommer(INTERROGATION,&uniteCourante,trace_xml);
+		expression();
+		consommer(DEUXPOINTS,&uniteCourante,trace_xml);
+		expression();
 	}else if (est_suivant_uniteCourante(_expressionBis_)){	// cas epsilon
 	}else{
 		erreur((char *) __func__);

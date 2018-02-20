@@ -29,13 +29,15 @@
 #define NOMBRE 28
 #define FIN 29
 #define VIRGULE 30
+#define INTERROGATION 31
+#define DEUXPOINTS 32
 
 /* A PARTIR D'ICI : NECESSAIRE UNIQUEMENT POUR L'ANALYSEUR SYNTAXIQUE */
 
 #define EPSILON 0
 
 #define NB_NON_TERMINAUX 42
-#define NB_TERMINAUX 31
+#define NB_TERMINAUX 33
 
 /* symboles non terminaux */
 

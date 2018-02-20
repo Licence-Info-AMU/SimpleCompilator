@@ -41,10 +41,12 @@ entier             { return ENTIER ; }
 retour             { return RETOUR ; }
 lire               { return LIRE ; }
 ecrire             { return ECRIRE ; }
-"$"{lettre}{nom}   { return ID_VAR ; }
+"$"{nom}   { return ID_VAR ; }
 {lettre}{nom}      { return ID_FCT ; }
 {chiffre}+         { return NOMBRE ; }
 ","                { return VIRGULE ; }
+"?"                { return INTERROGATION; }
+":"                { return DEUXPOINTS; }
 <<EOF>>            { return FIN; }  /* Fin de fichier */
 %%
 int yywrap(){
