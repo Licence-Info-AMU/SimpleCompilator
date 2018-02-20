@@ -27,9 +27,13 @@
         <symbole>ACCOLADE_OUVRANTE</symbole>
         <listeInstructions>
           <instruction>
-            <instructionEcriture>
-              <mot_clef>ecrire</mot_clef>
-              <symbole>PARENTHESE_OUVRANTE</symbole>
+            <instructionAffect>
+              <var>
+                <id_variable>$a</id_variable>
+                <optIndice>
+                </optIndice>
+              </var>
+              <symbole>EGAL</symbole>
               <expression>
                 <conjonction>
                   <comparaison>
@@ -41,14 +45,6 @@
                           </facteur>
                         </negation>
                         <termeBis>
-                          <symbole>FOIS</symbole>
-                          <negation>
-                            <facteur>
-                              <nombre>2</nombre>
-                            </facteur>
-                          </negation>
-                          <termeBis>
-                          </termeBis>
                         </termeBis>
                       </terme>
                       <expArithBis>
@@ -63,17 +59,52 @@
                 <expressionBis>
                 </expressionBis>
               </expression>
-              <symbole>PARENTHESE_FERMANTE</symbole>
               <symbole>POINT_VIRGULE</symbole>
-            </instructionEcriture>
+            </instructionAffect>
           </instruction>
           <listeInstructions>
+            <instruction>
+              <instructionEcriture>
+                <mot_clef>ecrire</mot_clef>
+                <symbole>PARENTHESE_OUVRANTE</symbole>
+                <expression>
+                  <conjonction>
+                    <comparaison>
+                      <expArith>
+                        <terme>
+                          <negation>
+                            <facteur>
+                              <var>
+                                <id_variable>$a</id_variable>
+                                <optIndice>
+                                </optIndice>
+                              </var>
+                            </facteur>
+                          </negation>
+                          <termeBis>
+                          </termeBis>
+                        </terme>
+                        <expArithBis>
+                        </expArithBis>
+                      </expArith>
+                      <comparaisonBis>
+                      </comparaisonBis>
+                    </comparaison>
+                    <conjonctionBis>
+                    </conjonctionBis>
+                  </conjonction>
+                  <expressionBis>
+                  </expressionBis>
+                </expression>
+                <symbole>PARENTHESE_FERMANTE</symbole>
+                <symbole>POINT_VIRGULE</symbole>
+              </instructionEcriture>
+            </instruction>
+            <listeInstructions>
+            </listeInstructions>
           </listeInstructions>
         </listeInstructions>
         <symbole>ACCOLADE_FERMANTE</symbole>
       </instructionBloc>
     </declarationFonction>
     <listeDecFonctions>
-    </listeDecFonctions>
-  </listeDecFonctions>
-</programme>

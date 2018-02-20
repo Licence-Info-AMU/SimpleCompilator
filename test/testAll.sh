@@ -43,11 +43,11 @@ MYCOMPILOSYNT="${MYCOMPILO} -s"  # exécuter l'analyseur syntaxique
 #MYCOMPILOTAB="${MYCOMPILO} -t"   # afficher les tables des symboles
 #MYCOMPILOMIPS="${MYCOMPILO} -m"  # générer code MIPS
 #MYCOMPILONASM="${MYCOMPILO} -n"  # générer code Intel
-# MARS="./Mars4_5.jar"             # utilisez autre version de Mars si besoin
-# NASM="nasm"                      # utilisez autre version de nasm si besoin
-# NASMOPTS="-f elf -g -F dwarf"
-# LD="ld"                          # utilisez autre version de ld si besoin
-# LDOPTS="-m elf_i386"
+#MARS="./Mars4_5.jar"             # utilisez autre version de Mars si besoin
+#NASM="nasm"                      # utilisez autre version de nasm si besoin
+#NASMOPTS="-f elf -g -F dwarf"
+#LD="ld"                          # utilisez autre version de ld si besoin
+#LDOPTS="-m elf_i386"
 ##############################################################################
 # NE PLUS LIRE À PARTIR D'ICI ;-)
 ##############################################################################
@@ -172,11 +172,11 @@ function diff_prog() {
   echo -e "`wc -l output/${input}.${suffix} | awk '{print $1}'` lignes"
   if [ -f ref-${suffix}/$input.${suffix} ]; then
     ${diffprog} output/${input}.${suffix} ref-${suffix}/${input}.${suffix} ${values} 2>&1 2> /dev/null # TODO: UNCOMMENT
-    if [ $? != 0 ]; then 
+    if [ ! $? -eq 0 ]; then 
       echo -e "\033[31mTEST ${testname[${suffix}]} ÉCHOUÉ\033[0m"
       echo -e "Différences entre output/${input}.${suffix} ref-${suffix}/${input}.${suffix} en utilisant $diffprog:"
       ${diffprog} output/${input}.${suffix} ref-${suffix}/${input}.${suffix} ${values}
-      if [ $EXITONFAIL = 1 ]; then exit 1; fi
+      if [ $EXITONFAIL -eq 1 ]; then exit 1; fi
     else
       echo -e "\033[32mTEST ${testname[${suffix}]} OK\033[0m"
     fi
@@ -202,10 +202,10 @@ function test_fichier_ok() {
       if [ -n "${MYCOMPILODEFAULT}" ]; then
         echo -e "\033[35m > Reconnaissance (accepte l'entrée)\033[0m"        
         ${MYCOMPILODEFAULT} input/$input.l > output/$input.synt
-        if [ $? != 0 ]; then 
+        if [ ! $? -eq 0 ]; then 
           echo -e "\033[31mTEST Reconnaissance ÉCHOUÉ\033[0m"
           echo -e "Le programme $input.l n'a pas été compilé correctement"	
-          if [ $EXITONFAIL = 1 ]; then exit 1; fi
+          if [ $EXITONFAIL -eq 1 ]; then exit 1; fi
         else
           echo -e "\033[32mTEST Reconnaissance OK\033[0m"
         fi
@@ -243,7 +243,7 @@ function test_fichier_ok() {
       # Sanity check: MIPS et Intel génèrent la même sortie
       if [ -n "${MYCOMPILOMIPS}" -a -n "${MYCOMPILONASM}" ]; then
         compare_mips_nasm ref-mips/$input.mips ref-nasm/$input.nasm "$2"
-	if [ $? != 0 ]; then 
+	if [ ! $? -eq 0 ]; then 
            echo -e "\033[34mATTENTION: MIPS et Intel différents\033[0m"
            exit -1
 	fi
@@ -262,10 +262,10 @@ function test_fichier_fail() {
 	input=$1
     echo -e "\n\033[4m ---- Test input/$input.l ----\033[0m"
     ${MYCOMPILODEFAULT} input/$input.l > /dev/null
-    if [ $? = 0 ]; then 
+    if [ $? -eq 0 ]; then 
     echo -e "\033[31mTEST REJET ÉCHOUÉ\033[0m"
       echo -e "Le programme $input.l est accepté mais il devrait être rejeté"
-      if [ $EXITONFAIL = 1 ]; then exit 1; fi
+      if [ $EXITONFAIL -eq 1 ]; then exit 1; fi
     else
       echo -e "\033[32mTEST REJET OK\033[0m"
     fi
@@ -320,11 +320,8 @@ echo -e "\033[1m\n>> 1.1) Tests connus OK\033[0m"
 
 test_fichier_ok affect
 test_fichier_ok boucle
-test_fichier_ok expression "5\n2\n"
-# 3 cas de figure selon les entrées tapées
-test_fichier_ok max "3\n10\n"
-test_fichier_ok max "10\n10\n"
-test_fichier_ok max "-3\n-10\n"
+test_fichier_ok expression
+test_fichier_ok max
 test_fichier_ok tri
 
 ################################################################################
@@ -334,4 +331,46 @@ echo -e "\033[1m\n>> 1.2) Tests connus FAIL\033[0m"
 test_fichier_fail affect-err
 
 ################################################################################
+
+echo -e "\033[1m\n>> 2.1) Tests nouveaux OK\033[0m"
+
+test_fichier_ok appel
+test_fichier_ok assoc-prec
+test_fichier_ok procedure_arg
+test_fichier_ok procedure
+test_fichier_ok procedure_retour
+test_fichier_ok procedure_varloc
+test_fichier_ok si
+test_fichier_ok sinon
+test_fichier_ok tableau
+test_fichier_ok tantque
+test_fichier_ok lexunits
+test_fichier_ok factorielle
+test_fichier_ok fibo
+test_fichier_ok pgcd
+
+################################################################################
+
+echo -e "\033[1m\n>> 2.2) Tests nouveaux FAIL\033[0m"
+
+test_fichier_fail lex-err     # fails at lex
+test_fichier_fail synt-err    # fails at synt
+test_fichier_fail extra       # fails at synt
+test_fichier_fail 33a         # fails at lex
+test_fichier_fail ordre       # fails at synt
+
+################################################################################
+
+echo -e "\033[1m\n>> 3.1) Tests nouvelle fonctionnalité OK\033[0m"
+
+# 3 fichiers OK nouvelle fonctionnalité
+test_fichier_ok nouveau1
+test_fichier_ok nouveau2
+test_fichier_ok nouveau3
+
+################################################################################
+echo -e "\033[1m\n>> 3.2) Tests nouvelle fonctionnalité FAIL\033[0m"
+
+# 1 fichier fail nouvelle fonctionnalité
+test_fichier_fail nouveau-erreur
 

@@ -1,0 +1,44 @@
+#!/usr/bin/perl
+
+while(<>){
+    if(s/<(\/?)pg>/<$1programme>/i){print;}
+    elsif(s/<(\/?)ldv>/<$1listeDecVariables>/i){print;}
+    elsif(s/<(\/?)ldf>/<$1listeDecFonctions>/i){print;}
+    elsif(s/<(\/?)dv>/<$1declarationVariable>/i){print;}
+    elsif(s/<(\/?)df>/<$1declarationFonction>/i){print;}
+    elsif(s/<(\/?)lp>/<$1listeParam>/i){print;}
+    elsif(s/<(\/?)li>/<$1listeInstructions>/i){print;}
+    elsif(s/<(\/?)i>/<$1instruction>/i){print;}
+    elsif(s/<(\/?)iaff>/<$1instructionAffect>/i){print;}  
+    elsif(s/<(\/?)ib>/<$1instructionBloc>/i){print;}
+    elsif(s/<(\/?)isi>/<$1instructionSi>/i){print;}
+    elsif(s/<(\/?)itq>/<$1instructionTantque>/i){print;} 
+    elsif(s/<(\/?)iapp>/<$1instructionAppel>/i){print;}
+    elsif(s/<(\/?)iret>/<$1instructionRetour>/i){print;}
+    elsif(s/<(\/?)iecr>/<$1instructionEcriture>/i){print;}
+    elsif(s/<(\/?)ivide>/<$1instructionVide>/i){print;}
+    elsif(s/<(\/?)var>/<$1var>/i){print;}
+    elsif(s/<(\/?)exp>/<$1expression>/i){print;}
+    elsif(s/<(\/?)appf>/<$1appelFct>/i){print;}
+    elsif(s/<(\/?)conj>/<$1conjonction>/i){print;}
+    elsif(s/<(\/?)neg>/<$1negation>/i){print;}
+    elsif(s/<(\/?)comp>/<$1comparaison>/i){print;}
+    elsif(s/<(\/?)e>/<$1expArith>/i){print;}
+    elsif(s/<(\/?)t>/<$1terme>/i){print;}
+    elsif(s/<(\/?)f>/<$1facteur>/i){print;}
+#    elsif(s/<(\/?)>/<$1argumentsEffectifs>/i){print;} 
+    elsif(s/<(\/?)lexp>/<$1listeExpressions>/i){print;}
+    elsif(s/<(\/?)lexpb>/<$1listeExpressionsBis>/i){print;}
+    elsif(s/<(\/?)conjb>/<$1conjonctionBis>/i){print;}
+    elsif(s/<(\/?)ott>/<$1optTailleTableau>/i){print;}
+    elsif(s/<(\/?)eb>/<$1expArithBis>/i){print;}
+    elsif(s/<(\/?)osinon>/<$1optSinon>/i){print;}
+    elsif(s/<(\/?)compb>/<$1comparaisonBis>/i){print;}
+    elsif(s/<(\/?)odv>/<$1optDecVariables>/i){print;}
+    elsif(s/<(\/?)oind>/<$1optIndice>/i){print;}
+    elsif(s/<(\/?)ldvb>/<$1listeDecVariablesBis>/i){print;}
+    elsif(s/<(\/?)tb>/<$1termeBis>/i){print;}
+    elsif(s/<(\/?)expb>/<$1expressionBis>/i){print;}
+    elsif(s/<(\/?)oldv>/<$1optListeDecVariables>/i){print;}
+    else{print;}
+}
