@@ -1,7 +1,5 @@
-entier $a, entier $b;
+entier $a;
 main()
 {
-$a = lire();
-$b = lire(); 
-ecrire($a + $b);
+ecrire(5 * 2);
 }
