@@ -14,4 +14,4 @@ analyseur_xml.o: analyseur_xml.c
 .PHONY : clean
 
 clean:
-	- rm -f *.o compare_arbres_xml
+	- rm -rf *.o compare_arbres_xml output/

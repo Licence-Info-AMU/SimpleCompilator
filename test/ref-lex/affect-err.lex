@@ -7,7 +7,16 @@ main	id_fonction	main
 {	symbole	ACCOLADE_OUVRANTE
 $a	id_variable	$a
 =	symbole	EGAL
-123	nombre	123
+5	nombre	5
+;	symbole	POINT_VIRGULE
+ecrire	mot_clef	ecrire
+(	symbole	PARENTHESE_OUVRANTE
+$a	id_variable	$a
+)	symbole	PARENTHESE_FERMANTE
 ;	symbole	POINT_VIRGULE
 }	symbole	ACCOLADE_FERMANTE
+$extra	id_variable	$extra
+=	symbole	EGAL
+0	nombre	0
+;	symbole	POINT_VIRGULE
 	symbole	FIN

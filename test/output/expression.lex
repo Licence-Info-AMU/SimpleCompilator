@@ -1,30 +1,30 @@
 entier	mot_clef	entier
-$a	id_variable	$a
+ $a	id_variable	$a
 ,	symbole	VIRGULE
-entier	mot_clef	entier
-$b	id_variable	$b
+ entier	mot_clef	entier
+ $b	id_variable	$b
 ;	symbole	POINT_VIRGULE
 main	id_fonction	main
 (	symbole	PARENTHESE_OUVRANTE
 )	symbole	PARENTHESE_FERMANTE
 {	symbole	ACCOLADE_OUVRANTE
 $a	id_variable	$a
-=	symbole	EGAL
-lire	mot_clef	lire
+ =	symbole	EGAL
+ lire	mot_clef	lire
 (	symbole	PARENTHESE_OUVRANTE
 )	symbole	PARENTHESE_FERMANTE
 ;	symbole	POINT_VIRGULE
 $b	id_variable	$b
-=	symbole	EGAL
-lire	mot_clef	lire
+ =	symbole	EGAL
+ lire	mot_clef	lire
 (	symbole	PARENTHESE_OUVRANTE
 )	symbole	PARENTHESE_FERMANTE
 ;	symbole	POINT_VIRGULE
-ecrire	mot_clef	ecrire
+ ecrire	mot_clef	ecrire
 (	symbole	PARENTHESE_OUVRANTE
 $a	id_variable	$a
-+	symbole	PLUS
-$b	id_variable	$b
+ +	symbole	PLUS
+ $b	id_variable	$b
 )	symbole	PARENTHESE_FERMANTE
 ;	symbole	POINT_VIRGULE
 }	symbole	ACCOLADE_FERMANTE

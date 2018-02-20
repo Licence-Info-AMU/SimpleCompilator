@@ -6,20 +6,20 @@
       <id_fonction>max</id_fonction>
       <listeParam>
         <symbole>PARENTHESE_OUVRANTE</symbole>
-        <optListeDecVariables>
+         <optListeDecVariables>
           <listeDecVariables>
             <declarationVariable>
               <mot_clef>entier</mot_clef>
-              <id_variable>$a</id_variable>
+               <id_variable>$a</id_variable>
               <optTailleTableau>
               </optTailleTableau>
             </declarationVariable>
             <listeDecVariablesBis>
               <symbole>VIRGULE</symbole>
-              <declarationVariable>
+               <declarationVariable>
                 <mot_clef>entier</mot_clef>
-                <id_variable>$b</id_variable>
-                <optTailleTableau>
+                 <id_variable>$b</id_variable>
+                 <optTailleTableau>
                 </optTailleTableau>
               </declarationVariable>
               <listeDecVariablesBis>
@@ -28,16 +28,16 @@
           </listeDecVariables>
         </optListeDecVariables>
         <symbole>PARENTHESE_FERMANTE</symbole>
-      </listeParam>
+       </listeParam>
       <optDecVariables>
       </optDecVariables>
       <instructionBloc>
         <symbole>ACCOLADE_OUVRANTE</symbole>
-        <listeInstructions>
+            <listeInstructions>
           <instruction>
             <instructionSi>
               <mot_clef>si</mot_clef>
-              <expression>
+               <expression>
                 <conjonction>
                   <comparaison>
                     <expArith>
@@ -46,7 +46,7 @@
                           <facteur>
                             <var>
                               <id_variable>$a</id_variable>
-                              <optIndice>
+                               <optIndice>
                               </optIndice>
                             </var>
                           </facteur>
@@ -59,13 +59,13 @@
                     </expArith>
                     <comparaisonBis>
                       <symbole>INFERIEUR</symbole>
-                      <expArith>
+                       <expArith>
                         <terme>
                           <negation>
                             <facteur>
                               <var>
                                 <id_variable>$b</id_variable>
-                                <optIndice>
+                                 <optIndice>
                                 </optIndice>
                               </var>
                             </facteur>
@@ -87,13 +87,13 @@
                 </expressionBis>
               </expression>
               <mot_clef>alors</mot_clef>
-              <instructionBloc>
+               <instructionBloc>
                 <symbole>ACCOLADE_OUVRANTE</symbole>
-                <listeInstructions>
+                        <listeInstructions>
                   <instruction>
                     <instructionRetour>
                       <mot_clef>retour</mot_clef>
-                      <expression>
+                       <expression>
                         <conjonction>
                           <comparaison>
                             <expArith>
@@ -123,13 +123,13 @@
                         </expressionBis>
                       </expression>
                       <symbole>POINT_VIRGULE</symbole>
-                    </instructionRetour>
+                        </instructionRetour>
                   </instruction>
                   <listeInstructions>
                   </listeInstructions>
                 </listeInstructions>
                 <symbole>ACCOLADE_FERMANTE</symbole>
-              </instructionBloc>
+                  </instructionBloc>
               <optSinon>
               </optSinon>
             </instructionSi>
@@ -138,7 +138,7 @@
             <instruction>
               <instructionRetour>
                 <mot_clef>retour</mot_clef>
-                <expression>
+                 <expression>
                   <conjonction>
                     <comparaison>
                       <expArith>
@@ -190,15 +190,15 @@
           <listeDecVariables>
             <declarationVariable>
               <mot_clef>entier</mot_clef>
-              <id_variable>$v_1</id_variable>
+               <id_variable>$v_1</id_variable>
               <optTailleTableau>
               </optTailleTableau>
             </declarationVariable>
             <listeDecVariablesBis>
               <symbole>VIRGULE</symbole>
-              <declarationVariable>
+               <declarationVariable>
                 <mot_clef>entier</mot_clef>
-                <id_variable>$v_2</id_variable>
+                 <id_variable>$v_2</id_variable>
                 <optTailleTableau>
                 </optTailleTableau>
               </declarationVariable>
@@ -210,16 +210,16 @@
         </optDecVariables>
         <instructionBloc>
           <symbole>ACCOLADE_OUVRANTE</symbole>
-          <listeInstructions>
+              <listeInstructions>
             <instruction>
               <instructionAffect>
                 <var>
                   <id_variable>$v_1</id_variable>
-                  <optIndice>
+                   <optIndice>
                   </optIndice>
                 </var>
                 <symbole>EGAL</symbole>
-                <expression>
+                 <expression>
                   <conjonction>
                     <comparaison>
                       <expArith>
@@ -247,18 +247,18 @@
                   </expressionBis>
                 </expression>
                 <symbole>POINT_VIRGULE</symbole>
-              </instructionAffect>
+                  </instructionAffect>
             </instruction>
             <listeInstructions>
               <instruction>
                 <instructionAffect>
                   <var>
                     <id_variable>$v_2</id_variable>
-                    <optIndice>
+                     <optIndice>
                     </optIndice>
                   </var>
                   <symbole>EGAL</symbole>
-                  <expression>
+                   <expression>
                     <conjonction>
                       <comparaison>
                         <expArith>
@@ -286,13 +286,13 @@
                     </expressionBis>
                   </expression>
                   <symbole>POINT_VIRGULE</symbole>
-                </instructionAffect>
+                    </instructionAffect>
               </instruction>
               <listeInstructions>
                 <instruction>
                   <instructionSi>
                     <mot_clef>si</mot_clef>
-                    <expression>
+                     <expression>
                       <conjonction>
                         <comparaison>
                           <expArith>
@@ -302,7 +302,7 @@
                                   <appelFct>
                                     <id_fonction>max</id_fonction>
                                     <symbole>PARENTHESE_OUVRANTE</symbole>
-                                    <listeExpressions>
+                                     <listeExpressions>
                                       <expression>
                                         <conjonction>
                                           <comparaison>
@@ -334,7 +334,7 @@
                                       </expression>
                                       <listeExpressionsBis>
                                         <symbole>VIRGULE</symbole>
-                                        <expression>
+                                         <expression>
                                           <conjonction>
                                             <comparaison>
                                               <expArith>
@@ -343,7 +343,7 @@
                                                     <facteur>
                                                       <var>
                                                         <id_variable>$v_2</id_variable>
-                                                        <optIndice>
+                                                         <optIndice>
                                                         </optIndice>
                                                       </var>
                                                     </facteur>
@@ -368,7 +368,7 @@
                                       </listeExpressionsBis>
                                     </listeExpressions>
                                     <symbole>PARENTHESE_FERMANTE</symbole>
-                                  </appelFct>
+                                   </appelFct>
                                 </facteur>
                               </negation>
                               <termeBis>
@@ -379,13 +379,13 @@
                           </expArith>
                           <comparaisonBis>
                             <symbole>EGAL</symbole>
-                            <expArith>
+                             <expArith>
                               <terme>
                                 <negation>
                                   <facteur>
                                     <var>
                                       <id_variable>$v_1</id_variable>
-                                      <optIndice>
+                                       <optIndice>
                                       </optIndice>
                                     </var>
                                   </facteur>
@@ -407,14 +407,14 @@
                       </expressionBis>
                     </expression>
                     <mot_clef>alors</mot_clef>
-                    <instructionBloc>
+                        <instructionBloc>
                       <symbole>ACCOLADE_OUVRANTE</symbole>
-                      <listeInstructions>
+                              <listeInstructions>
                         <instruction>
                           <instructionEcriture>
                             <mot_clef>ecrire</mot_clef>
                             <symbole>PARENTHESE_OUVRANTE</symbole>
-                            <expression>
+                             <expression>
                               <conjonction>
                                 <comparaison>
                                   <expArith>
@@ -423,7 +423,7 @@
                                         <facteur>
                                           <var>
                                             <id_variable>$v_1</id_variable>
-                                            <optIndice>
+                                             <optIndice>
                                             </optIndice>
                                           </var>
                                         </facteur>
@@ -445,23 +445,23 @@
                             </expression>
                             <symbole>PARENTHESE_FERMANTE</symbole>
                             <symbole>POINT_VIRGULE</symbole>
-                          </instructionEcriture>
+                              </instructionEcriture>
                         </instruction>
                         <listeInstructions>
                         </listeInstructions>
                       </listeInstructions>
                       <symbole>ACCOLADE_FERMANTE</symbole>
-                    </instructionBloc>
+                        </instructionBloc>
                     <optSinon>
                       <mot_clef>sinon</mot_clef>
-                      <instructionBloc>
+                          <instructionBloc>
                         <symbole>ACCOLADE_OUVRANTE</symbole>
-                        <listeInstructions>
+                                <listeInstructions>
                           <instruction>
                             <instructionEcriture>
                               <mot_clef>ecrire</mot_clef>
                               <symbole>PARENTHESE_OUVRANTE</symbole>
-                              <expression>
+                               <expression>
                                 <conjonction>
                                   <comparaison>
                                     <expArith>
@@ -470,7 +470,7 @@
                                           <facteur>
                                             <var>
                                               <id_variable>$v_2</id_variable>
-                                              <optIndice>
+                                               <optIndice>
                                               </optIndice>
                                             </var>
                                           </facteur>
@@ -492,7 +492,7 @@
                               </expression>
                               <symbole>PARENTHESE_FERMANTE</symbole>
                               <symbole>POINT_VIRGULE</symbole>
-                            </instructionEcriture>
+                                </instructionEcriture>
                           </instruction>
                           <listeInstructions>
                           </listeInstructions>

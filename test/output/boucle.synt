@@ -3,15 +3,15 @@
     <listeDecVariables>
       <declarationVariable>
         <mot_clef>entier</mot_clef>
-        <id_variable>$i</id_variable>
+         <id_variable>$i</id_variable>
         <optTailleTableau>
         </optTailleTableau>
       </declarationVariable>
       <listeDecVariablesBis>
         <symbole>VIRGULE</symbole>
-        <declarationVariable>
+         <declarationVariable>
           <mot_clef>entier</mot_clef>
-          <id_variable>$carre</id_variable>
+           <id_variable>$carre</id_variable>
           <optTailleTableau>
           </optTailleTableau>
         </declarationVariable>
@@ -34,16 +34,16 @@
       </optDecVariables>
       <instructionBloc>
         <symbole>ACCOLADE_OUVRANTE</symbole>
-        <listeInstructions>
+            <listeInstructions>
           <instruction>
             <instructionAffect>
               <var>
                 <id_variable>$i</id_variable>
-                <optIndice>
+                 <optIndice>
                 </optIndice>
               </var>
               <symbole>EGAL</symbole>
-              <expression>
+               <expression>
                 <conjonction>
                   <comparaison>
                     <expArith>
@@ -69,13 +69,13 @@
                 </expressionBis>
               </expression>
               <symbole>POINT_VIRGULE</symbole>
-            </instructionAffect>
+                </instructionAffect>
           </instruction>
           <listeInstructions>
             <instruction>
               <instructionTantque>
                 <mot_clef>tantque</mot_clef>
-                <expression>
+                 <expression>
                   <conjonction>
                     <comparaison>
                       <expArith>
@@ -84,7 +84,7 @@
                             <facteur>
                               <var>
                                 <id_variable>$i</id_variable>
-                                <optIndice>
+                                 <optIndice>
                                 </optIndice>
                               </var>
                             </facteur>
@@ -97,12 +97,12 @@
                       </expArith>
                       <comparaisonBis>
                         <symbole>INFERIEUR</symbole>
-                        <expArith>
+                         <expArith>
                           <terme>
                             <negation>
                               <facteur>
                                 <nombre>10</nombre>
-                              </facteur>
+                               </facteur>
                             </negation>
                             <termeBis>
                             </termeBis>
@@ -121,18 +121,18 @@
                   </expressionBis>
                 </expression>
                 <mot_clef>faire</mot_clef>
-                <instructionBloc>
+                     <instructionBloc>
                   <symbole>ACCOLADE_OUVRANTE</symbole>
-                  <listeInstructions>
+                          <listeInstructions>
                     <instruction>
                       <instructionAffect>
                         <var>
                           <id_variable>$carre</id_variable>
-                          <optIndice>
+                           <optIndice>
                           </optIndice>
                         </var>
                         <symbole>EGAL</symbole>
-                        <expression>
+                         <expression>
                           <conjonction>
                             <comparaison>
                               <expArith>
@@ -141,14 +141,14 @@
                                     <facteur>
                                       <var>
                                         <id_variable>$i</id_variable>
-                                        <optIndice>
+                                         <optIndice>
                                         </optIndice>
                                       </var>
                                     </facteur>
                                   </negation>
                                   <termeBis>
                                     <symbole>FOIS</symbole>
-                                    <negation>
+                                     <negation>
                                       <facteur>
                                         <var>
                                           <id_variable>$i</id_variable>
@@ -174,14 +174,14 @@
                           </expressionBis>
                         </expression>
                         <symbole>POINT_VIRGULE</symbole>
-                      </instructionAffect>
+                              </instructionAffect>
                     </instruction>
                     <listeInstructions>
                       <instruction>
                         <instructionEcriture>
                           <mot_clef>ecrire</mot_clef>
                           <symbole>PARENTHESE_OUVRANTE</symbole>
-                          <expression>
+                           <expression>
                             <conjonction>
                               <comparaison>
                                 <expArith>
@@ -190,7 +190,7 @@
                                       <facteur>
                                         <var>
                                           <id_variable>$carre</id_variable>
-                                          <optIndice>
+                                           <optIndice>
                                           </optIndice>
                                         </var>
                                       </facteur>
@@ -212,18 +212,18 @@
                           </expression>
                           <symbole>PARENTHESE_FERMANTE</symbole>
                           <symbole>POINT_VIRGULE</symbole>
-                        </instructionEcriture>
+                                </instructionEcriture>
                       </instruction>
                       <listeInstructions>
                         <instruction>
                           <instructionAffect>
                             <var>
                               <id_variable>$i</id_variable>
-                              <optIndice>
+                               <optIndice>
                               </optIndice>
                             </var>
                             <symbole>EGAL</symbole>
-                            <expression>
+                             <expression>
                               <conjonction>
                                 <comparaison>
                                   <expArith>
@@ -232,7 +232,7 @@
                                         <facteur>
                                           <var>
                                             <id_variable>$i</id_variable>
-                                            <optIndice>
+                                             <optIndice>
                                             </optIndice>
                                           </var>
                                         </facteur>
@@ -242,7 +242,7 @@
                                     </terme>
                                     <expArithBis>
                                       <symbole>PLUS</symbole>
-                                      <terme>
+                                       <terme>
                                         <negation>
                                           <facteur>
                                             <nombre>1</nombre>
@@ -265,7 +265,7 @@
                               </expressionBis>
                             </expression>
                             <symbole>POINT_VIRGULE</symbole>
-                          </instructionAffect>
+                              </instructionAffect>
                         </instruction>
                         <listeInstructions>
                         </listeInstructions>

@@ -8,15 +8,8 @@
       <l_instr>
         <instr_affect>
           <var_simple>$a</var_simple>
-          <intExp>1</intExp>
+          <intExp>123</intExp>
         </instr_affect>
-        <l_instr>
-          <instr_ecrire>
-            <varExp>
-              <var_simple>$a</var_simple>
-            </varExp>
-          </instr_ecrire>
-        </l_instr>
       </l_instr>
     </foncDec>
   </l_dec>
