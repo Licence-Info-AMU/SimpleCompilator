@@ -1,0 +1,1 @@
+(((B B B R) (G B R G) R G) (B B R B) R B)
