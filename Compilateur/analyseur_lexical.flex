@@ -17,6 +17,7 @@ nom [a-zA-Z0-9_$]*
 "\n"			   {  } /* Retours chariot */
 "#".*              {  } /* Commentaires */
 "/*".*"*/"              {  } /* Commentaires */
+"//".*              {  } /* Commentaires */
 ";"                { return POINT_VIRGULE;	}
 "+"                { return PLUS; }
 "-"                { return MOINS; }
