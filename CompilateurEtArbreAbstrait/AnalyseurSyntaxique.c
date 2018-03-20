@@ -124,7 +124,10 @@ int optTailleTableau(){									//OTT
 ////////////////////////////////////////////////////////////////////////////////////////
 
 n_l_dec *  listeDecFonctions(){								//LDF
+	n_dec * declarationFonction=NULL;
 	n_l_dec * listeDecFonctions=NULL;
+
+
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(est_premier_uniteCourante(_declarationFonction_)){
 		declarationFonction=declarationFonction();
@@ -134,20 +137,25 @@ n_l_dec *  listeDecFonctions(){								//LDF
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
-	return
+	return cree_n_l_dec(declarationFonction,listeDecFonctions);
 }
 
-void declarationFonction(){								//DF
+n_dec * declarationFonction(){								//DF
+	 * listeParam=NULL;
+	 * optDecVariables=NULL;
+	 * instructionBloc=NULL;
+
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==ID_FCT){
 		consommer(ID_FCT,&uniteCourante,trace_xml);
-		listeParam();
-		optDecVariables();
-		instructionBloc();
+		listeParam=listeParam();
+		optDecVariables=optDecVariables();
+		instructionBloc=instructionBloc();
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return ;
 }
 
 void listeParam(){										//LP
