@@ -1,9 +1,8 @@
 #ifndef __ANALYSEURSYNTAXIQUE__
 #define __ANALYSEURSYNTAXIQUE__
+#include "syntabs.h"
 
 int uniteCourante;
-char nom[100];
-char valeur[100];
 int trace_xml;
 
 int est_premier_uniteCourante(int arg);
