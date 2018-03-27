@@ -5,12 +5,13 @@
 #include "util.h"
 #include "premiers.h"
 #include "suivants.h"
-#include "AnalyseurSyntaxique.h"	
+#include "AnalyseurSyntaxique.h"
 
 int uniteCourante;
 int yylex(void);
 extern char *yytext;
 FILE *yyin;
+char temp[100];
 
 int est_premier_uniteCourante(int arg){
 	return (est_premier(arg, uniteCourante) || est_premier(arg, EPSILON));
@@ -21,94 +22,96 @@ int est_suivant_uniteCourante(int arg){
 }
 
 n_prog * programme(){										//PG
-	n_l_dec * optDecVariables=NULL;
-	n_l_dec * listeDecFonctions=NULL;
-
+	n_l_dec * odv=NULL;
+	n_l_dec * ldf=NULL;
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(est_premier_uniteCourante(_optDecVariables_)){
-		optDecVariables=optDecVariables();
-		listeDecFonctions=listeDecFonctions();
+		odv=optDecVariables();
+		ldf=listeDecFonctions();
 	}else if(est_premier_uniteCourante(_listeDecFonctions_)){
-		listeDecFonctions=listeDecFonctions();
+		ldf=listeDecFonctions();
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
-	return cree_n_prog(optDecVariables,listeDecFonctions);
+	return cree_n_prog(odv,ldf);
 }
 
 n_l_dec * optDecVariables(){									//ODV
-	n_l_dec * listeDecVariables=NULL;
+	n_l_dec * ldv=NULL;
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(est_premier_uniteCourante(_listeDecVariables_)){
-		listeDecVariables=listeDecVariables();
+		ldv=listeDecVariables();
 		consommer(POINT_VIRGULE,&uniteCourante,trace_xml);
 	}else if (est_suivant_uniteCourante(_optDecVariables_)){	// cas epsilon
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
-	return listeDecVariables;
+	return ldv;
 }
 
 n_l_dec * listeDecVariables(){								//LDV
-	n_dec * declarationVariable=NULL;
-	n_l_dec * listeDecVariablesBis=NULL;
+	n_dec * dv=NULL;
+	n_l_dec * ldv=NULL;
 
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(est_premier_uniteCourante(_declarationVariable_)){
-		declarationVariable=declarationVariable();
-		listeDecVariablesBis=listeDecVariablesBis();
+		dv=declarationVariable();
+		ldv=listeDecVariablesBis();
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
-	return cree_n_l_dec(declarationVariable,listeDecVariablesBis);
+	return cree_n_l_dec(dv,ldv);
 }
 
 n_l_dec * listeDecVariablesBis(){							//LDVB
-	n_dec * declarationVariable=NULL;
-	n_l_dec * listeDecVariablesBis=NULL;
+	n_dec * dv=NULL;
+	n_l_dec * ldv=NULL;
 
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==VIRGULE){
 		consommer(VIRGULE,&uniteCourante,trace_xml);
-		declarationVariable=declarationVariable();
-		listeDecVariablesBis=listeDecVariablesBis();
+		dv=declarationVariable();
+		ldv=listeDecVariablesBis();
 	}else if (est_suivant_uniteCourante(_listeDecVariablesBis_)){	// cas epsilon
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
-	return cree_n_l_dec(declarationVariable,listeDecVariablesBis);
+	return cree_n_l_dec(dv,ldv);
 }
-
+//HEY
 n_dec * declarationVariable(){								//DV
-
-	int optTailleTableau=NULL;
-	char temp[100];
-
+	n_dec * var = NULL;
+	int ott=-1;
+	char temp2[100];
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==ENTIER){
 		consommer(ENTIER,&uniteCourante,trace_xml);
-		nom_token(uniteCourante,temp,valeur);
+		nom_token(uniteCourante,nom,valeur);
+		strcpy(temp2,valeur);
 		consommer(ID_VAR,&uniteCourante,trace_xml);
-		optTailleTableau=optTailleTableau();
+		ott=optTailleTableau();
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
-	if (optTailleTableau == -1){
-		cree_n_l_dec_tab(temp,optTailleTableau);
+	if (ott == -1){
+		var = cree_n_dec_tab(temp2,ott);
 	}
-	return cree_n_dec_var(temp);
+	var = cree_n_dec_var(temp2);
+	return var;
 }
 
 int optTailleTableau(){									//OTT
+	char temp2[100];
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==CROCHET_OUVRANT){
 		consommer(CROCHET_OUVRANT,&uniteCourante,trace_xml);
 		nom_token(uniteCourante,nom,valeur);
+		strcpy(temp2,valeur);
 		consommer(NOMBRE,&uniteCourante,trace_xml);
 		consommer(CROCHET_FERMANT,&uniteCourante,trace_xml);
 	}else if (est_suivant_uniteCourante(_optTailleTableau_)){	// cas epsilon
@@ -117,208 +120,238 @@ int optTailleTableau(){									//OTT
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
-	optTailleTableau=cree_n_dec_tab(nom,valeur);
-	return atoi(valeur);
+	return atoi(temp2);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
 n_l_dec *  listeDecFonctions(){								//LDF
-	n_dec * declarationFonction=NULL;
-	n_l_dec * listeDecFonctions=NULL;
-
+	n_dec * df=NULL;
+	n_l_dec * ldf=NULL;
 
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(est_premier_uniteCourante(_declarationFonction_)){
-		declarationFonction=declarationFonction();
-		listeDecFonctions=listeDecFonctions();
+		df=declarationFonction();
+		ldf=listeDecFonctions();
 	}else if (est_suivant_uniteCourante(_listeDecFonctions_)){	// cas epsilon
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
-	return cree_n_l_dec(declarationFonction,listeDecFonctions);
+	return cree_n_l_dec(df,ldf);
 }
 
 n_dec * declarationFonction(){								//DF
-	 * listeParam=NULL;
-	 * optDecVariables=NULL;
-	 * instructionBloc=NULL;
-
+	n_l_dec * lp=NULL;
+	n_l_dec * odv=NULL;
+	n_instr * ib=NULL;
+	char temp2[100];
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==ID_FCT){
+		nom_token(uniteCourante,nom,valeur);
+		strcpy(temp2,valeur);
 		consommer(ID_FCT,&uniteCourante,trace_xml);
-		listeParam=listeParam();
-		optDecVariables=optDecVariables();
-		instructionBloc=instructionBloc();
+		lp=listeParam();
+		odv=optDecVariables();
+		ib=instructionBloc();
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
-	return ;
+	return  cree_n_dec_fonc(temp2,lp,odv,ib);
 }
 
-void listeParam(){										//LP
+n_l_dec * listeParam(){
+	n_l_dec * odv=NULL;										//LP
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==PARENTHESE_OUVRANTE){
 		consommer(PARENTHESE_OUVRANTE,&uniteCourante,trace_xml);
-		optListeDecVariables();
+		odv=optListeDecVariables();
 		consommer(PARENTHESE_FERMANTE,&uniteCourante,trace_xml);
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return odv;
 }
 
-void optListeDecVariables(){							//OLDV
+n_l_dec * optListeDecVariables(){
+	n_l_dec * ldv=NULL;								//OLDV
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(est_premier_uniteCourante(_listeDecVariables_)){
-		listeDecVariables();
+		ldv=listeDecVariables();
 	}else if (est_suivant_uniteCourante(_optListeDecVariables_)){	// cas epsilon
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return ldv;
 }
 
-void instruction(){										//I
+n_instr * instruction(){
+	n_instr * inst=NULL;										//I
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(est_premier_uniteCourante(_instructionAffect_)){
-		instructionAffect();
+		inst=instructionAffect();
 	}else if (est_premier_uniteCourante(_instructionBloc_)){
-		instructionBloc();
+		inst=instructionBloc();
 	}else if (est_premier_uniteCourante(_instructionSi_)){
-		instructionSi();
+		inst=instructionSi();
 	}else if (est_premier_uniteCourante(_instructionTantque_)){
-		instructionTantque();
+		inst=instructionTantque();
 	}else if (est_premier_uniteCourante(_instructionAppel_)){
-		instructionAppel();
+		inst=instructionAppel();
 	}else if (est_premier_uniteCourante(_instructionRetour_)){
-		instructionRetour();
+		inst=instructionRetour();
 	}else if (est_premier_uniteCourante(_instructionEcriture_)){
-		instructionEcriture();
+		inst=instructionEcriture();
 	}else if (est_premier_uniteCourante(_instructionVide_)){
-		instructionVide();
+		inst=instructionVide();
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return inst;
 }
 
-void instructionAffect(){								//IAFF
+n_instr * instructionAffect(){
+	n_var *	Var=NULL;
+	n_exp *	exp=NULL;					
+	//IAFF
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(est_premier_uniteCourante(_var_)){
-		var();
+		Var=var();
 		consommer(EGAL,&uniteCourante,trace_xml);
-		expression();
+		exp=expression();
 		consommer(POINT_VIRGULE,&uniteCourante,trace_xml);
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return cree_n_instr_affect(Var,exp);
 }
 
-void instructionBloc(){									//IB
+n_instr * instructionBloc(){
+	n_l_instr * li = NULL;									//IB
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==ACCOLADE_OUVRANTE){
 		consommer(ACCOLADE_OUVRANTE,&uniteCourante,trace_xml);
-		listeInstructions();
+		li=listeInstructions();
 		consommer(ACCOLADE_FERMANTE,&uniteCourante,trace_xml);
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return cree_n_instr_bloc(li);
 }
 
-void listeInstructions(){								//LI
+n_l_instr * listeInstructions(){
+	n_instr * inst = NULL;
+	n_l_instr *	li = NULL;							//LI
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(est_premier_uniteCourante(_instruction_)){
-		instruction();
-		listeInstructions();
+		inst=instruction();
+		li=listeInstructions();
 	}else if (est_suivant_uniteCourante(_listeInstructions_)){	// cas epsilon
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return cree_n_l_instr(inst,li);
 }
 
-void instructionSi(){									//ISI
+n_instr * instructionSi(){									//ISI
+	n_exp * exp = NULL;
+	n_instr * ib = NULL;
+	n_instr * oSinon = NULL;
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==SI){
 		consommer(SI,&uniteCourante,trace_xml);
-		expression();
+		exp=expression();
 		consommer(ALORS,&uniteCourante,trace_xml);
-		instructionBloc();
-		optSinon();
+		ib=instructionBloc();
+		oSinon=optSinon();
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return cree_n_instr_si(exp,ib,oSinon);
 }
 
-void optSinon(){										//OSINON
+n_instr * optSinon(){										//OSINON
+	n_instr * ib = NULL;
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==SINON){
 		consommer(SINON,&uniteCourante,trace_xml);
-		instructionBloc();
+		ib=instructionBloc();
 	}else if (est_suivant_uniteCourante(_optSinon_)){	// cas epsilon
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return ib;
 }
 
-void instructionTantque(){								//ITQ
+n_instr * instructionTantque(){								//ITQ
+	n_exp * exp = NULL;
+	n_instr * ib = NULL;
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==TANTQUE){
 		consommer(TANTQUE,&uniteCourante,trace_xml);
-		expression();
+		exp=expression();
 		consommer(FAIRE,&uniteCourante,trace_xml);
-		instructionBloc();
+		ib=instructionBloc();
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return cree_n_instr_tantque(exp,ib);
 }
 
-void instructionAppel(){								//IAPP
+n_instr * instructionAppel(){								//IAPP
+	n_appel *aFct = NULL;
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(est_premier_uniteCourante(_appelFct_)){
-		appelFct();
+		aFct=appelFct();
 		consommer(POINT_VIRGULE,&uniteCourante,trace_xml);
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return cree_n_instr_appel(aFct);
 }
 
-void instructionRetour(){								//IRET
+n_instr * instructionRetour(){								//IRET
+	n_exp * exp = NULL;
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==RETOUR){
 		consommer(RETOUR,&uniteCourante,trace_xml);
-		expression();
+		exp=expression();
 		consommer(POINT_VIRGULE,&uniteCourante,trace_xml);
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return cree_n_instr_retour(exp);
 }
 
-void instructionEcriture(){								//IECR
+n_instr * instructionEcriture(){								//IECR
+	n_exp * exp = NULL;
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==ECRIRE){
 		consommer(ECRIRE,&uniteCourante,trace_xml);
 		consommer(PARENTHESE_OUVRANTE,&uniteCourante,trace_xml);
-		expression();
+		exp=expression();
 		consommer(PARENTHESE_FERMANTE,&uniteCourante,trace_xml);
 		consommer(POINT_VIRGULE,&uniteCourante,trace_xml);
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return cree_n_instr_ecrire(exp);
 }
 
-void instructionVide(){									//IVIDE
+n_instr * instructionVide(){									//IVIDE
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==POINT_VIRGULE){
 		consommer(POINT_VIRGULE,&uniteCourante,trace_xml);
@@ -326,238 +359,320 @@ void instructionVide(){									//IVIDE
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return cree_n_instr_vide();
 }
 
-void expression(){										//EXP
+n_exp * expression(){										//EXP
+	n_exp * conj = NULL;
+	n_exp * eb = NULL;
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(est_premier_uniteCourante(_conjonction_)){
-		conjonction();
-		expressionBis();
+		conj=conjonction();
+		eb=expressionBis(conj);
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return eb;
 }
 
-void expressionBis(){									//EXPB
+
+n_exp * expressionBis(n_exp * herite){									//EXPB
+	n_exp * conj = NULL;
+	n_exp * eb = NULL;
+	n_exp * op = NULL;
+	n_exp * exp = NULL;
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==OU){
 		consommer(OU,&uniteCourante,trace_xml);
-		conjonction();
-		expressionBis();
+		conj=conjonction();
+		op = cree_n_exp_op(ou,herite,conj);
+		eb=expressionBis(op);
 	}else if(uniteCourante==INTERROGATION){
 		consommer(INTERROGATION,&uniteCourante,trace_xml);
 		expression();
 		consommer(DEUXPOINTS,&uniteCourante,trace_xml);
 		expression();
 	}else if (est_suivant_uniteCourante(_expressionBis_)){	// cas epsilon
+		return herite;
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return eb;
 }
 
-void conjonction(){										//CONJ
+n_exp * conjonction(){										//CONJ
+	n_exp * c = NULL;
+	n_exp * cb = NULL;
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(est_premier_uniteCourante(_comparaison_)){
-		comparaison();
-		conjonctionBis();
+		c=comparaison();
+		cb=conjonctionBis(c);
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return cb;
 }
 
-void conjonctionBis(){									//CONJB
+n_exp * conjonctionBis(n_exp * herite){									//CONJB
+	n_exp * c = NULL;
+	n_exp * op = NULL;
+	n_exp * cb = NULL;
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==ET){
 		consommer(ET,&uniteCourante,trace_xml);
-		comparaison();
-		conjonctionBis();
+		c=comparaison();
+		op = cree_n_exp_op(et,herite,c);
+		cb=conjonctionBis(op);
 	}else if (est_suivant_uniteCourante(_conjonctionBis_)){	// cas epsilon
+		return herite;
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return cb;
 }
 
-void comparaison(){										//COMP
+n_exp * comparaison(){										//COMP
+	n_exp * ea = NULL;
+	n_exp * cb = NULL;
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(est_premier_uniteCourante(_expArith_)){
-		expArith();
-		comparaisonBis();
+		ea=expArith();
+		cb=comparaisonBis(ea);
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return cb;
 }
 
-void comparaisonBis(){									//COMPB
+n_exp * comparaisonBis(n_exp * herite){									//COMPB
+	n_exp * ea = NULL;
+	n_exp * cb = NULL;
+	n_exp * op = NULL;
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==EGAL){
 		consommer(EGAL,&uniteCourante,trace_xml);
-		expArith();
-		comparaisonBis();
+		ea=expArith();
+		op = cree_n_exp_op(egal,herite,ea);
+		cb=comparaisonBis(op);
 	}else if(uniteCourante==INFERIEUR){
 		consommer(INFERIEUR,&uniteCourante,trace_xml);
-		expArith();
-		comparaisonBis();
+		ea=expArith();
+		op = cree_n_exp_op(inferieur,herite,ea);
+		cb=comparaisonBis(op);
 	}else if (est_suivant_uniteCourante(_comparaisonBis_)){	// cas epsilon
+		return herite;
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return cb;
 }
 
-void expArith(){										//E
+n_exp * expArith(){										//E
+	n_exp * t = NULL;
+	n_exp * eab = NULL;
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(est_premier_uniteCourante(_terme_)){
-		terme();
-		expArithBis();
+		t=terme();
+		eab=expArithBis(t);
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return eab;
 }
 
-void expArithBis(){										//EB
+n_exp * expArithBis(n_exp * herite){										//EB
+	n_exp * t = NULL;
+	n_exp * eab = NULL;
+	n_exp * op = NULL;
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==PLUS){
 		consommer(PLUS,&uniteCourante,trace_xml);
-		terme();
-		expArithBis();
+		t=terme();
+		op = cree_n_exp_op(plus,herite,t);
+		eab=expArithBis(op);
 	}else if(uniteCourante==MOINS){
 		consommer(MOINS,&uniteCourante,trace_xml);
-		terme();
-		expArithBis();
+		t=terme();
+		op = cree_n_exp_op(moins,herite,t);
+		eab=expArithBis(op);
 	}else if (est_suivant_uniteCourante(_expArithBis_)){	// cas epsilon
+		return herite;
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return eab;
 }
 
-void terme(){											//T
+n_exp * terme(){											//T
+	n_exp * neg = NULL;
+	n_exp * tb = NULL;
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(est_premier_uniteCourante(_negation_)){
-		negation();
-		termeBis();
+		neg=negation();
+		tb=termeBis(neg);
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return tb;
 }
 
-void termeBis(){										//TB
+n_exp * termeBis(n_exp * herite){										//TB
+	n_exp * neg = NULL;
+	n_exp * tb = NULL;
+	n_exp * op = NULL;
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==FOIS){
 		consommer(FOIS,&uniteCourante,trace_xml);
-		negation();
-		termeBis();
+		neg=negation();
+		op = cree_n_exp_op(fois,herite,neg);
+		tb=termeBis(op);
 	}else if(uniteCourante==DIVISE){
 		consommer(DIVISE,&uniteCourante,trace_xml);
-		negation();
-		termeBis();
+		neg=negation();
+		op = cree_n_exp_op(divise,herite,neg);
+		tb=termeBis(op);
 	}else if (est_suivant_uniteCourante(_termeBis_)){	// cas epsilon
+		return herite;
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return tb;
 }
 
-void negation(){										//NEG
+n_exp * negation(){										//NEG
+	n_exp * op = NULL;
+	n_exp * neg = NULL;
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==NON){
 		consommer(NON,&uniteCourante,trace_xml);
-		negation();
+		neg=negation();
+		op = cree_n_exp_op(non,neg,NULL);
 	}else if(est_premier_uniteCourante(_facteur_)){
-		facteur();
+		op = facteur();
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return op;
 }
 
-void facteur(){											//F
+n_exp * facteur(){											//F
+	n_exp * exp = NULL;
+	char temp2[100];
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==PARENTHESE_OUVRANTE){
 		consommer(PARENTHESE_OUVRANTE,&uniteCourante,trace_xml);
-		expression();
+		exp=expression();
 		consommer(PARENTHESE_FERMANTE,&uniteCourante,trace_xml);
 	}else if (uniteCourante==NOMBRE){
+		nom_token(uniteCourante,nom,valeur);
+		strcpy(temp2,valeur);
 		consommer(NOMBRE,&uniteCourante,trace_xml);
+		exp=cree_n_exp_entier(atoi(temp2));
 	}else if (est_premier_uniteCourante(_appelFct_)){
-		appelFct();
+		exp=cree_n_exp_appel(appelFct());
 	}else if (est_premier_uniteCourante(_var_)){
-		var();
+		exp=cree_n_exp_var(var());
 	}else if (uniteCourante==LIRE){
 		consommer(LIRE,&uniteCourante,trace_xml);
+		exp=cree_n_exp_lire();
 		consommer(PARENTHESE_OUVRANTE,&uniteCourante,trace_xml);
 		consommer(PARENTHESE_FERMANTE,&uniteCourante,trace_xml);
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return exp;
 }
 
-void var(){												//VAR
+n_var * var(){												//VAR
+	n_var * v = NULL;
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==ID_VAR){
+		nom_token(uniteCourante,nom,valeur);
+		strcpy(temp,valeur);
 		consommer(ID_VAR,&uniteCourante,trace_xml);
-		optIndice();
+		v = optIndice();
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return v;
 }
 
-void optIndice(){										//OIND
+n_var * optIndice(){										//OIND
+	n_exp * exp = NULL;
+	n_var * var = NULL;
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==CROCHET_OUVRANT){
 		consommer(CROCHET_OUVRANT,&uniteCourante,trace_xml);
-		expression();
+		exp = expression();
+		var = cree_n_var_indicee(temp,exp);
 		consommer(CROCHET_FERMANT,&uniteCourante,trace_xml);
 	}else if (est_suivant_uniteCourante(_optIndice_)){	// cas epsilon
+		var = cree_n_var_simple(temp);
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return var;
 }
 
-void appelFct(){										//APPF
+n_appel * appelFct(){										//APPF
+	n_l_exp * le = NULL;
+	char temp2[100];
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==ID_FCT){
+		nom_token(uniteCourante,nom,valeur);
+		strcpy(temp2,valeur);
 		consommer(ID_FCT,&uniteCourante,trace_xml);
 		consommer(PARENTHESE_OUVRANTE,&uniteCourante,trace_xml);
-		listeExpressions();
+		le=listeExpressions();
 		consommer(PARENTHESE_FERMANTE,&uniteCourante,trace_xml);
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return cree_n_appel(temp2,le);
 }
 
-void listeExpressions(){								//LEXP
+n_l_exp * listeExpressions(){								//LEXP
+	n_exp * exp = NULL;
+	n_l_exp * leb = NULL;
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(est_premier_uniteCourante(_expression_)){
-		expression();
-		listeExpressionsBis();
+		exp=expression();
+		leb=listeExpressionsBis();
 	}else if (est_suivant_uniteCourante(_listeExpressions_)){
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return cree_n_l_exp(exp,leb);
 }
 
-void listeExpressionsBis(){								//LEXPB
+n_l_exp * listeExpressionsBis(){								//LEXPB
+	n_exp * exp = NULL;
+	n_l_exp * leb = NULL;
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==VIRGULE){
 		consommer(VIRGULE,&uniteCourante,trace_xml);
-		expression();
-		listeExpressionsBis();
+		exp=expression();
+		leb=listeExpressionsBis();
 	}else if (est_suivant_uniteCourante(_listeExpressionsBis_)){	// cas epsilon
 	}else{
 		erreur((char *) __func__);
 	}
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
+	return cree_n_l_exp(exp,leb);
 }

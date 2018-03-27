@@ -4,85 +4,86 @@
 
 int uniteCourante;
 int trace_xml;
-
+char nom[100];
+char valeur[100];
 int est_premier_uniteCourante(int arg);
 
 int est_suivant_uniteCourante(int arg);
 
-void programme();
+n_prog * programme();
 
-void optDecVariables();
+n_l_dec * optDecVariables();
 
-void listeDecVariables();
+n_l_dec * listeDecVariables();
 
-void listeDecVariablesBis();
+n_l_dec * listeDecVariablesBis();
 
-void declarationVariable();
+n_dec * declarationVariable();
 
-void optTailleTableau();
+int optTailleTableau();
 
-void listeDecFonctions();
+n_l_dec *  listeDecFonctions();
 
-void declarationFonction();
+n_dec * declarationFonction();
 
-void listeParam();
+n_l_dec * listeParam();
 
-void optListeDecVariables();
+n_l_dec * optListeDecVariables();
 
-void instruction();
+n_instr * instruction();
 
-void instructionAffect();
+n_instr * instructionAffect();
 
-void instructionBloc();
+n_instr * instructionBloc();
 
-void listeInstructions();
+n_l_instr * listeInstructions();
 
-void instructionSi();
+n_instr * instructionSi();
 
-void optSinon();
+n_instr * optSinon();
 
-void instructionTantque();
+n_instr * instructionTantque();
 
-void instructionAppel();
+n_instr * instructionAppel();
 
-void instructionRetour();
+n_instr * instructionRetour();
 
-void instructionEcriture();
+n_instr * instructionEcriture();
 
-void instructionVide();
+n_instr * instructionVide();
 
-void expression();
+n_exp * expression();
 
-void expressionBis();
+n_exp * expressionBis(n_exp * herite);
 
-void conjonction();
+n_exp * conjonction();
 
-void conjonctionBis();
+n_exp * conjonctionBis(n_exp * herite);
 
-void comparaison();
+n_exp * comparaison();
 
-void comparaisonBis();
+n_exp * comparaisonBis(n_exp * herite);
 
-void expArith();
+n_exp * expArith();
 
-void expArithBis();
+n_exp * expArithBis(n_exp * herite);
 
-void terme();
+n_exp * terme();
 
-void termeBis();
+n_exp * termeBis(n_exp * herite);
 
-void negation();
+n_exp * negation();
 
-void facteur();
+n_exp * facteur();
 
-void var();
+n_var * var();
 
-void optIndice();
+n_var * optIndice();
 
-void appelFct();
+n_appel * appelFct();
 
-void listeExpressions();
+n_l_exp * listeExpressions();
 
-void listeExpressionsBis();
+n_l_exp * listeExpressionsBis();
 
 #endif

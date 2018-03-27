@@ -6,6 +6,7 @@
 #include "AnalyseurSyntaxique.h"
 #include "premiers.h"
 #include "suivants.h"
+#include "affiche_arbre_abstrait.h"
 
 int yylex(void);
 extern char *yytext;
@@ -72,7 +73,7 @@ int main(int argc, char **argv){
 	initialise_suivants();
 
 	uniteCourante = yylex();  
-	programme();
+	affiche_n_prog(programme());
 	
 	//C'est la fin !
 	if (uniteCourante == FIN) {
