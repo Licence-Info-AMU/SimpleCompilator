@@ -76,6 +76,7 @@ n_l_dec * listeDecVariablesBis(){							//LDVB
 		dv=declarationVariable();
 		ldv=listeDecVariablesBis();
 	}else if (est_suivant_uniteCourante(_listeDecVariablesBis_)){	// cas epsilon
+		return NULL;
 	}else{
 		erreur((char *) __func__);
 	}
@@ -134,6 +135,7 @@ n_l_dec *  listeDecFonctions(){								//LDF
 		df=declarationFonction();
 		ldf=listeDecFonctions();
 	}else if (est_suivant_uniteCourante(_listeDecFonctions_)){	// cas epsilon
+		return NULL;
 	}else{
 		erreur((char *) __func__);
 	}
@@ -181,6 +183,7 @@ n_l_dec * optListeDecVariables(){
 	if(est_premier_uniteCourante(_listeDecVariables_)){
 		ldv=listeDecVariables();
 	}else if (est_suivant_uniteCourante(_optListeDecVariables_)){	// cas epsilon
+		return NULL;
 	}else{
 		erreur((char *) __func__);
 	}
@@ -253,6 +256,7 @@ n_l_instr * listeInstructions(){
 		inst=instruction();
 		li=listeInstructions();
 	}else if (est_suivant_uniteCourante(_listeInstructions_)){	// cas epsilon
+		return NULL;
 	}else{
 		erreur((char *) __func__);
 	}
@@ -654,6 +658,7 @@ n_l_exp * listeExpressions(){								//LEXP
 		exp=expression();
 		leb=listeExpressionsBis();
 	}else if (est_suivant_uniteCourante(_listeExpressions_)){
+		return NULL;
 	}else{
 		erreur((char *) __func__);
 	}
@@ -670,6 +675,7 @@ n_l_exp * listeExpressionsBis(){								//LEXPB
 		exp=expression();
 		leb=listeExpressionsBis();
 	}else if (est_suivant_uniteCourante(_listeExpressionsBis_)){	// cas epsilon
+		return NULL;
 	}else{
 		erreur((char *) __func__);
 	}
