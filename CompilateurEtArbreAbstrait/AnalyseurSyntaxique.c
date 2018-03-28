@@ -86,7 +86,7 @@ n_l_dec * listeDecVariablesBis(){							//LDVB
 n_dec * declarationVariable(){								//DV
 	n_dec * var = NULL;
 	int ott=-1;
-	char temp2[100];
+	char * temp2= malloc(sizeof(char)*100);
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==ENTIER){
 		consommer(ENTIER,&uniteCourante,trace_xml);
@@ -106,7 +106,7 @@ n_dec * declarationVariable(){								//DV
 }
 
 int optTailleTableau(){									//OTT
-	char temp2[100];
+	char * temp2= malloc(sizeof(char)*100);
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==CROCHET_OUVRANT){
 		consommer(CROCHET_OUVRANT,&uniteCourante,trace_xml);
@@ -145,7 +145,7 @@ n_dec * declarationFonction(){								//DF
 	n_l_dec * lp=NULL;
 	n_l_dec * odv=NULL;
 	n_instr * ib=NULL;
-	char temp2[100];
+	char * temp2= malloc(sizeof(char)*100);
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==ID_FCT){
 		nom_token(uniteCourante,nom,valeur);
@@ -568,7 +568,7 @@ n_exp * negation(){										//NEG
 
 n_exp * facteur(){											//F
 	n_exp * exp = NULL;
-	char temp2[100];
+	char * temp2= malloc(sizeof(char)*100);
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==PARENTHESE_OUVRANTE){
 		consommer(PARENTHESE_OUVRANTE,&uniteCourante,trace_xml);
@@ -630,7 +630,7 @@ n_var * optIndice(){										//OIND
 
 n_appel * appelFct(){										//APPF
 	n_l_exp * le = NULL;
-	char temp2[100];
+	char * temp2= malloc(sizeof(char)*100);
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==ID_FCT){
 		nom_token(uniteCourante,nom,valeur);
