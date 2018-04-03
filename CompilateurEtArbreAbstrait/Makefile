@@ -4,7 +4,7 @@ FLEX = ./flex
 LIBS = -lm 
 CCFLAGS = -Wall -ggdb
 
-OBJ = analyseur_lexical_flex.o util.o Compilateur.o AnalyseurSyntaxique.o premiers.o suivants.o syntabs.o affiche_arbre_abstrait.o
+OBJ = analyseur_lexical_flex.o util.o Compilateur.o AnalyseurSyntaxique.o premiers.o suivants.o syntabs.o affiche_arbre_abstrait.o tabsymboles.o parcours_arbre_abstrait.o
 EXEC = compilateur test_yylex
 
 all :: $(EXEC)

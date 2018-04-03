@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include "syntabs.h"
 #include "util.h"
-#include "parcours_arbres_abstrait.h"
+#include "tabsymboles.h"
+#include "parcours_arbre_abstrait.h"
 
-extern int portee = P_VARIABLE_GLOBALE;
-extern int adresseLocaleCourante = 0;
-extern int adresseArgumentCourant = 0;
+int portee = P_VARIABLE_GLOBALE;
+int adresseLocaleCourante = 0;
+int adresseArgumentCourant = 0;
 
 /*-------------------------------------------------------------------------*/
 
@@ -234,7 +235,7 @@ void parcours_var(n_var *n){
 /*-------------------------------------------------------------------------*/
 void parcours_var_simple(n_var *n){
 	int var_id = rechercheExecutable(n->nom); // On cherche si "nom" existe
-	if (id >= 0){ // Si on trouve var_id
+	if (var_id >= 0){ // Si on trouve var_id
 
 	}else{
 		printf("Variable non declaree : %s\n", n->nom);
@@ -244,7 +245,7 @@ void parcours_var_simple(n_var *n){
 /*-------------------------------------------------------------------------*/
 void parcours_var_indicee(n_var *n){
 	int var_id = rechercheExecutable(n->nom); // On cherche si "nom" existe
-	if (id >= 0){ // Si on trouve var_id
+	if (var_id >= 0){ // Si on trouve var_id
 
 	}else{
 		printf("Variable non declaree : %s\n", n->nom);
