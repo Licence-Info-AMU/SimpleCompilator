@@ -4,16 +4,20 @@
 #include "tabsymboles.h"
 #include "parcours_arbre_abstrait.h"
 
-int portee = P_VARIABLE_GLOBALE;
-int adresseLocaleCourante = 0;
-int adresseArgumentCourant = 0;
+extern int portee;
+extern int adresseLocaleCourante;
+extern int adresseArgumentCourant;
+int paramcpt;
+int trace_tabsymb = 1;
 
 /*-------------------------------------------------------------------------*/
 
 void parcours_n_prog(n_prog *n){
-  parcours_l_dec(n->variables);
-  parcours_l_dec(n->fonctions); 
-  
+	portee = P_VARIABLE_GLOBALE;
+	adresseLocaleCourante = 0;
+	adresseArgumentCourant = 0;
+	parcours_l_dec(n->variables);
+	parcours_l_dec(n->fonctions); 
 }
 
 /*-------------------------------------------------------------------------*/
@@ -73,14 +77,9 @@ void parcours_instr_appel(n_instr *n){
 /*-------------------------------------------------------------------------*/
 
 void parcours_appel(n_appel *n){
-	int fonc_id = rechercheDeclarative(n->fonction);
+	int fonc_id = rechercheExecutable(n->fonction);
 	if (fonc_id >= 0){
-		entreeFonction();
-		parcours_l_exp(n->args);  // ATTENTION : après avoir traité les arguments, votre programme doit modifier __excplicitement___
-		tabsymboles.base = tabsymboles.sommet;  // la valeur de `portee` pour stocker les var. locales avec la portée P_VARIABLE_LOCALE
-		portee = P_VARIABLE_LOCALE;
-		sortieFonction(0);
-		portee = P_VARIABLE_GLOBALE;
+		parcours_l_exp(n->args);  				
 	}else{
 		printf("Nom de fonction inconnue : %s\n", n->fonction);
 	}
@@ -162,17 +161,18 @@ void parcours_l_dec(n_l_dec *n){
 /*-------------------------------------------------------------------------*/
 
 void parcours_dec(n_dec *n){
-  if(n){
-    if(n->type == foncDec) {
-      parcours_foncDec(n);
-    }
-    else if(n->type == varDec) {
-      parcours_varDec(n);
-    }
-    else if(n->type == tabDec) { 
-      parcours_tabDec(n);
-    }
-  }
+	if(n){
+		paramcpt++;
+		if(n->type == foncDec) {
+			parcours_foncDec(n);
+		}
+		else if(n->type == varDec) {
+			parcours_varDec(n);
+		}
+		else if(n->type == tabDec) { 
+			parcours_tabDec(n);
+		}
+	}
 }
 
 /*-------------------------------------------------------------------------*/
@@ -183,26 +183,30 @@ void parcours_foncDec(n_dec *n){
 		printf("Nom de fonction deja utilise : %s\n", n->nom);
 	}else{
 		// Ajout de la fonction
-		adresseLocaleCourante = 0;
-		tabsymboles.base = tabsymboles.sommet;
-		ajouteIdentificateur(n->nom, portee, T_FONCTION, adresseLocaleCourante, 0); // TODO : nombre de parametres en dernier champ
+		paramcpt=0;
+		int id=ajouteIdentificateur(n->nom, portee, T_FONCTION, adresseLocaleCourante, 0);
+		entreeFonction();
+		parcours_l_dec(n->u.foncDec_.param);
+		tabsymboles.tab[id].complement = paramcpt;
+		portee = P_VARIABLE_LOCALE;
+		parcours_l_dec(n->u.foncDec_.variables);
+		parcours_instr(n->u.foncDec_.corps);
+		sortieFonction(trace_tabsymb);
 	}
-	parcours_l_dec(n->u.foncDec_.param);
-	parcours_l_dec(n->u.foncDec_.variables);
-	parcours_instr(n->u.foncDec_.corps);
+
 }
 
 /*-------------------------------------------------------------------------*/
 
 void parcours_varDec(n_dec *n){
 	int var_id = rechercheDeclarative(n->nom); // On cherche si "nom" existe deja
-	if (var_id >= 0){
-	// Verifier qu'elles n'ont pas la meme portee   
-
+	// Verifier qu'elles n'ont pas la meme portee
+	if((var_id >= 0) && (tabsymboles.tab[var_id].portee != portee) || (var_id == -1)){
+		ajouteIdentificateur(n->nom, portee, T_ENTIER, adresseLocaleCourante, 1);
+		adresseLocaleCourante += 4;
+		afficheTabsymboles();
 	}else{
-	// Ajout de la variable
-	ajouteIdentificateur(n->nom, portee, T_ENTIER, adresseLocaleCourante, 1);
-	adresseLocaleCourante += 4;
+		printf("Variable déjà declarée : %s\n", n->nom);
 	}
 }
 
@@ -210,33 +214,32 @@ void parcours_varDec(n_dec *n){
 
 void parcours_tabDec(n_dec *n){
 	int var_id = rechercheDeclarative(n->nom);
-	if (var_id >= 0)
-	{
-
-	}else{
 	// Verifier qu'elles n'ont pas la meme portee
-	int id =  ajouteIdentificateur(n->nom, portee, T_TABLEAU_ENTIER, 
-						 adresseLocaleCourante, n->u.tabDec_.taille);
-	adresseLocaleCourante += 4*(n->u.tabDec_.taille);
+	if((var_id >= 0) && (tabsymboles.tab[var_id].portee != portee) || (var_id == -1)){
+		ajouteIdentificateur(n->nom, portee, T_TABLEAU_ENTIER, adresseLocaleCourante, n->u.tabDec_.taille);
+		adresseLocaleCourante += 4*(n->u.tabDec_.taille);
+	}else{
+		printf("Variable déjà declarée : %s\n", n->nom);
 	}
 }
 
 /*-------------------------------------------------------------------------*/
 
 void parcours_var(n_var *n){
-  if(n->type == simple) {
-    parcours_var_simple(n);
-  }
-  else if(n->type == indicee) {
-    parcours_var_indicee(n);
-  }
+	if(n->type == simple) {
+		parcours_var_simple(n);
+	}else if(n->type == indicee) {
+		parcours_var_indicee(n);
+	}
 }
 
 /*-------------------------------------------------------------------------*/
 void parcours_var_simple(n_var *n){
 	int var_id = rechercheExecutable(n->nom); // On cherche si "nom" existe
 	if (var_id >= 0){ // Si on trouve var_id
-
+		if(tabsymboles.tab[var_id].type != T_ENTIER){
+			printf("Mauvais type : %s\n", n->nom);
+		}
 	}else{
 		printf("Variable non declaree : %s\n", n->nom);
 	}
@@ -246,10 +249,13 @@ void parcours_var_simple(n_var *n){
 void parcours_var_indicee(n_var *n){
 	int var_id = rechercheExecutable(n->nom); // On cherche si "nom" existe
 	if (var_id >= 0){ // Si on trouve var_id
-
+		if(tabsymboles.tab[var_id].type != T_TABLEAU_ENTIER){
+			printf("Mauvais type : %s\n", n->nom);
+		}else{
+			parcours_exp( n->u.indicee_.indice );
+		}
 	}else{
 		printf("Variable non declaree : %s\n", n->nom);
 	}
-  parcours_exp( n->u.indicee_.indice );
 }
 /*-------------------------------------------------------------------------*/

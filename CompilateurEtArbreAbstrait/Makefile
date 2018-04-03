@@ -5,11 +5,11 @@ LIBS = -lm
 CCFLAGS = -Wall -ggdb
 
 OBJ = analyseur_lexical_flex.o util.o Compilateur.o AnalyseurSyntaxique.o premiers.o suivants.o syntabs.o affiche_arbre_abstrait.o tabsymboles.o parcours_arbre_abstrait.o
-EXEC = compilateur test_yylex
+EXEC = Compilateur test_yylex
 
 all :: $(EXEC)
 
-compilateur: Compilateur.c $(OBJ)
+Compilateur: Compilateur.c $(OBJ)
 	$(CC) $(CCFLAGS) -o Compilateur $(OBJ)
 
 test_yylex: test_yylex.c $(OBJ)

@@ -7,6 +7,8 @@
 #include "premiers.h"
 #include "suivants.h"
 #include "affiche_arbre_abstrait.h"
+#include "tabsymboles.h"
+#include "parcours_arbre_abstrait.h"
 
 int yylex(void);
 extern char *yytext;
@@ -73,7 +75,9 @@ int main(int argc, char **argv){
 	initialise_suivants();
 
 	uniteCourante = yylex();  
-	affiche_n_prog(programme());
+	n_prog * prog = programme();
+	affiche_n_prog(prog);
+	parcours_n_prog(prog);
 	
 	//C'est la fin !
 	if (uniteCourante == FIN) {
