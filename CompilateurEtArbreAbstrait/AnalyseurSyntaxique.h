@@ -78,7 +78,7 @@ n_exp * facteur();
 
 n_var * var();
 
-n_var * optIndice();
+n_exp * optIndice();
 
 n_appel * appelFct();
 

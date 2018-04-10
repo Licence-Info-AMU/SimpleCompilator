@@ -8,7 +8,7 @@ extern int portee;
 extern int adresseLocaleCourante;
 extern int adresseArgumentCourant;
 int paramcpt;
-int trace_tabsymb = 1;
+int trace_tabsymb = 0;
 
 /*-------------------------------------------------------------------------*/
 

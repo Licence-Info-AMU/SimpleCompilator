@@ -77,7 +77,7 @@ int main(int argc, char **argv){
 	uniteCourante = yylex();  
 	n_prog * prog = programme();
 	affiche_n_prog(prog);
-	parcours_n_prog(prog);
+	//parcours_n_prog(prog);
 	
 	//C'est la fin !
 	if (uniteCourante == FIN) {
