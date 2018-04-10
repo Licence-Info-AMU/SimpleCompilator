@@ -11,7 +11,6 @@ int uniteCourante;
 int yylex(void);
 extern char *yytext;
 FILE *yyin;
-char temp[100];
 
 int est_premier_uniteCourante(int arg){
 	return (est_premier(arg, uniteCourante) || est_premier(arg, EPSILON));
@@ -97,7 +96,6 @@ n_dec * declarationVariable(){								//DV
 		consommer(ID_VAR,&uniteCourante,trace_xml);
 		ott=optTailleTableau();
 	}else{
-		affiche_balise_fermante(__FUNCTION__, trace_xml);
 		erreur((char *) __func__);
 	}
 	
@@ -106,6 +104,7 @@ n_dec * declarationVariable(){								//DV
 	}else{
 		var = cree_n_dec_var(temp2);
 	}
+	
 	affiche_balise_fermante(__FUNCTION__, trace_xml);
 	return var;
 }
@@ -618,18 +617,19 @@ n_exp * facteur(){											//F
 n_var * var(){												//VAR
 	n_exp * v = NULL;
 	n_var *$$ = NULL;
+	char * temp2= malloc(sizeof(char)*100);
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==ID_VAR){
 		nom_token(uniteCourante,nom,valeur);
-		strcpy(temp,valeur);
+		strcpy(temp2,valeur);
 		consommer(ID_VAR,&uniteCourante,trace_xml);
 		v = optIndice();
 
 		if (v != NULL){
-			$$ = cree_n_var_indicee(temp,v);
+			$$ = cree_n_var_indicee(temp2,v);
 			
 		}else{			
-			$$ = cree_n_var_simple(temp);		
+			$$ = cree_n_var_simple(temp2);		
 		}
 	}else{
 		erreur((char *) __func__);
@@ -644,8 +644,8 @@ n_exp * optIndice(){										//OIND
 	if(uniteCourante==CROCHET_OUVRANT){
 		consommer(CROCHET_OUVRANT,&uniteCourante,trace_xml);
 		exp = expression();
-		consommer(CROCHET_FERMANT,&uniteCourante,trace_xml);
-	}else if (est_suivant_uniteCourante(_optIndice_)){	// cas epsilon
+		consommer(CROCHET_FERMANT,&uniteCourante,trace_xml);	
+	}else if (est_suivant_uniteCourante(_optIndice_)){	// cas epsilon	
 		affiche_balise_fermante(__FUNCTION__, trace_xml);
 		return NULL;
 	}else{

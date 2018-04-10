@@ -48,11 +48,11 @@ void parcours_instr(n_instr *n){
 /*-------------------------------------------------------------------------*/
 
 void parcours_instr_si(n_instr *n){  
-  parcours_exp(n->u.si_.test);
-  parcours_instr(n->u.si_.alors);
-  if(n->u.si_.sinon){
-    parcours_instr(n->u.si_.sinon);
-  }
+	parcours_exp(n->u.si_.test);
+	parcours_instr(n->u.si_.alors);
+	if(n->u.si_.sinon){
+		parcours_instr(n->u.si_.sinon);
+	}
 }
 
 /*-------------------------------------------------------------------------*/
@@ -88,48 +88,48 @@ void parcours_appel(n_appel *n){
 /*-------------------------------------------------------------------------*/
 
 void parcours_instr_retour(n_instr *n){
-  parcours_exp(n->u.retour_.expression);
+	parcours_exp(n->u.retour_.expression);
 }
 
 /*-------------------------------------------------------------------------*/
 
 void parcours_instr_ecrire(n_instr *n){
-  parcours_exp(n->u.ecrire_.expression);
+	parcours_exp(n->u.ecrire_.expression);
 }
 
 /*-------------------------------------------------------------------------*/
 
 void parcours_l_exp(n_l_exp *n){
-  if(n){
-    parcours_exp(n->tete);
-    parcours_l_exp(n->queue);
-  } 
+	if(n){
+		parcours_exp(n->tete);
+		parcours_l_exp(n->queue);
+	} 
 }
 
 /*-------------------------------------------------------------------------*/
 
 void parcours_exp(n_exp *n){
-  if(n->type == varExp) parcours_varExp(n);
-  else if(n->type == opExp) parcours_opExp(n);
-  else if(n->type == intExp) parcours_intExp(n);
-  else if(n->type == appelExp) parcours_appelExp(n);
-  else if(n->type == lireExp) parcours_lireExp(n);
+	if(n->type == varExp) parcours_varExp(n);
+	else if(n->type == opExp) parcours_opExp(n);
+	else if(n->type == intExp) parcours_intExp(n);
+	else if(n->type == appelExp) parcours_appelExp(n);
+	else if(n->type == lireExp) parcours_lireExp(n);
 }
 
 /*-------------------------------------------------------------------------*/
 
 void parcours_varExp(n_exp *n){
-  parcours_var(n->u.var);  
+	parcours_var(n->u.var);  
 }
 
 /*-------------------------------------------------------------------------*/
 void parcours_opExp(n_exp *n){
-  if( n->u.opExp_.op1 != NULL ) {
-    parcours_exp(n->u.opExp_.op1);
-  }
-  if( n->u.opExp_.op2 != NULL ) {
-    parcours_exp(n->u.opExp_.op2);
-  } 
+	if( n->u.opExp_.op1 != NULL ) {
+		parcours_exp(n->u.opExp_.op1);
+	}
+	if( n->u.opExp_.op2 != NULL ) {
+		parcours_exp(n->u.opExp_.op2);
+	} 
 }
 
 /*-------------------------------------------------------------------------*/
@@ -146,16 +146,16 @@ void parcours_lireExp(n_exp *n){
 /*-------------------------------------------------------------------------*/
 
 void parcours_appelExp(n_exp *n){
-  parcours_appel(n->u.appel);
+	parcours_appel(n->u.appel);
 }
 
 /*-------------------------------------------------------------------------*/
 
 void parcours_l_dec(n_l_dec *n){
-  if( n ){   
-    parcours_dec(n->tete);
-    parcours_l_dec(n->queue);   
-  }
+	if( n ){   
+		parcours_dec(n->tete);
+		parcours_l_dec(n->queue);   
+	}
 }
 
 /*-------------------------------------------------------------------------*/
@@ -226,6 +226,7 @@ void parcours_tabDec(n_dec *n){
 /*-------------------------------------------------------------------------*/
 
 void parcours_var(n_var *n){
+	//printf("n->nom : %s\n n->type : %d\n simple : %d\n",n->nom,n->type,indicee);
 	if(n->type == simple) {
 		parcours_var_simple(n);
 	}else if(n->type == indicee) {
@@ -238,7 +239,7 @@ void parcours_var_simple(n_var *n){
 	int var_id = rechercheExecutable(n->nom); // On cherche si "nom" existe
 	if (var_id >= 0){ // Si on trouve var_id
 		if(tabsymboles.tab[var_id].type != T_ENTIER){
-			printf("Mauvais type : %s\n", n->nom);
+			printf("Mauvais type (Entier attendu) : %s\n ", n->nom);
 		}
 	}else{
 		printf("Variable non declaree : %s\n", n->nom);
@@ -250,7 +251,7 @@ void parcours_var_indicee(n_var *n){
 	int var_id = rechercheExecutable(n->nom); // On cherche si "nom" existe
 	if (var_id >= 0){ // Si on trouve var_id
 		if(tabsymboles.tab[var_id].type != T_TABLEAU_ENTIER){
-			printf("Mauvais type : %s\n", n->nom);
+			printf("Mauvais type (Tableau attendu) : %s\n", n->nom);
 		}else{
 			parcours_exp( n->u.indicee_.indice );
 		}
