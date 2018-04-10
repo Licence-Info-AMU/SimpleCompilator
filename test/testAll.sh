@@ -31,15 +31,15 @@
 
 # 1) MODIFIEZ LA VARIABLE CI-DESSOUS AVEC LE CHEMIN VERS VOTRE COMPILATEUR
 
-MYCOMPILO="../Compilateur/Compilateur"
+MYCOMPILO="../CompilateurEtArbreAbstrait/Compilateur"
 
 # 2) DÉCOMMENTEZ + MODIFIEZ LES COMMANDES POUR GÉNÉRER LES DIFFÉRENTES SORTIES
 
 EXITONFAIL=1                     # mettre à zéro pour continuer après erreurs
 MYCOMPILODEFAULT="${MYCOMPILO}"  # utilisé pour test reconnaissance et erreur
-MYCOMPILOLEX="${MYCOMPILO} -l"   # exécuter l'analyseur lexical
-MYCOMPILOSYNT="${MYCOMPILO} -s"  # exécuter l'analyseur syntaxique
-#MYCOMPILOASYNT="${MYCOMPILO} -a" # afficher l'arbre abstrait
+#MYCOMPILOLEX="${MYCOMPILO} -l"   # exécuter l'analyseur lexical
+#MYCOMPILOSYNT="${MYCOMPILO} -s"  # exécuter l'analyseur syntaxique
+MYCOMPILOASYNT="${MYCOMPILO} " # afficher l'arbre abstrait
 #MYCOMPILOTAB="${MYCOMPILO} -t"   # afficher les tables des symboles
 #MYCOMPILOMIPS="${MYCOMPILO} -m"  # générer code MIPS
 #MYCOMPILONASM="${MYCOMPILO} -n"  # générer code Intel
