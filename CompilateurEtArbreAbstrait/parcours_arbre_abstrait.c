@@ -18,13 +18,13 @@ void parcours_n_prog(n_prog *n){
 	adresseArgumentCourant = 0;
 	fp = fopen ("test.asm", "w+");
 	if(showIntel){
-		printf("\n%%include \"io.asm\"\nsection .bss\n");	
-		fprintf(fp,"%%include \"io.asm\"\nsection .bss\n");
+		printf("\n%%include \"io.asm\"\nsection .bss\nsinput: resb 255\n");	
+		fprintf(fp,"%%include \"io.asm\"\nsection .bss\nsinput: resb 255\n");
 	}
 	parcours_l_dec(n->variables);
 	if(showIntel){
-		printf("global _start\n_start:\ncall main\nmov eax, 1 ; 1 est le code de SYS_EXIT\nint 0x80 ; exit\nmain:\n");
-		fprintf(fp,"global _start\n_start:\ncall main\nmov eax, 1 ; 1 est le code de SYS_EXIT\nint 0x80 ; exit\nmain:\n");
+		printf("section .text\nglobal _start\n_start:\n\tcall main\n\tmov eax, 1\n\tint 0x80\nmain:\n");
+		fprintf(fp,"section .text\nglobal _start\n_start:\n\tcall main\n\tmov eax, 1\n\tint 0x80\nmain:\n");
 	}
 	parcours_l_dec(n->fonctions);
 	if(showIntel){
@@ -79,16 +79,26 @@ void parcours_instr_tantque(n_instr *n){
 /*-------------------------------------------------------------------------*/
 
 void parcours_instr_affect(n_instr *n){
-	if(showIntel){
-		
-	}
-	
-	parcours_var(n->u.affecte_.var);
-	parcours_exp(n->u.affecte_.exp); 
-	
-	if (showIntel){
-
-	}
+	int id = rechercheExecutable(n->u.affecte_.var->nom);
+	if (id !=-1){
+		parcours_var(n->u.affecte_.var);
+		parcours_exp(n->u.affecte_.exp); 
+		if (showIntel){
+			fprintf(fp, "\tpop ebx\n");
+			if(tabsymboles.tab[id].portee == P_VARIABLE_GLOBALE){
+				if(tabsymboles.tab[id].type == T_TABLEAU_ENTIER){
+					printf("\tpop eax\n\timul eax, 4\n\tmov[%s + eax], ebx\n",n->u.affecte_.var->nom);
+					fprintf(fp, "\tpop eax\n\timul eax, 4\n\tmov[%s + eax], ebx\n",n->u.affecte_.var->nom);
+				}else{
+					printf("\tmov [v%s], ebx\n",n->u.affecte_.var->nom);
+					fprintf(fp, "\tmov [v%s], ebx\n",n->u.affecte_.var->nom);
+				}
+			}else if (tabsymboles.tab[id].portee == P_VARIABLE_LOCALE){
+				printf("\tmov [ebp %d], ebx\n",-4-tabsymboles.tab[id].adresse);
+				fprintf(fp, "\tmov [ebp %d], ebx\n",-4-tabsymboles.tab[id].adresse);
+			}
+		}
+	}	
 }
 
 /*-------------------------------------------------------------------------*/
@@ -167,8 +177,8 @@ void parcours_intExp(n_exp *n){
 /*-------------------------------------------------------------------------*/
 void parcours_lireExp(n_exp *n){
 	if (showIntel){
-      printf("\tpop eax\n\tcall readline\n");
-      fprintf(fp,"\tpop eax\n\tcall readline\n");
+		printf("\tmov eax, sinput\n\tcall readline\n\tmov eax, sinput\n\tcall atoi\n\tpush eax\n");
+		fprintf(fp,"\tmov eax, sinput\n\tcall readline\nmov eax, sinput\ncall atoi\npush eax\n");
 	}
 }
 
