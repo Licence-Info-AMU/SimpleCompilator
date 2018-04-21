@@ -13,6 +13,7 @@ int paramcpt;
 
 void parcours_n_prog(n_prog *n){
 	if(showIntel){
+		printf("\n%%include \"io.asm\"\nsection .bss\nsinput: resb 255\n");
 		printf("global _start\n_start:\ncall main\nmov eax, 1 ; 1 est le code de SYS_EXIT\nint 0x80 ; exit\nmain:\n");
 	}
 	portee = P_VARIABLE_GLOBALE;
