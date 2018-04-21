@@ -12,14 +12,16 @@ int paramcpt;
 /*-------------------------------------------------------------------------*/
 
 void parcours_n_prog(n_prog *n){
-	if(showIntel){
-		printf("\n%%include \"io.asm\"\nsection .bss\nsinput: resb 255\n");
-		printf("global _start\n_start:\ncall main\nmov eax, 1 ; 1 est le code de SYS_EXIT\nint 0x80 ; exit\nmain:\n");
-	}
 	portee = P_VARIABLE_GLOBALE;
 	adresseLocaleCourante = 0;
 	adresseArgumentCourant = 0;
+	if(showIntel){
+		printf("\n%%include \"io.asm\"\nsection .bss\nsinput: resb 255\n");	
+	}
 	parcours_l_dec(n->variables);
+	if(showIntel){
+		printf("global _start\n_start:\ncall main\nmov eax, 1 ; 1 est le code de SYS_EXIT\nint 0x80 ; exit\nmain:\n");
+	}
 	parcours_l_dec(n->fonctions);
 	if(showIntel){
 		printf("ret\n");
@@ -71,8 +73,16 @@ void parcours_instr_tantque(n_instr *n){
 /*-------------------------------------------------------------------------*/
 
 void parcours_instr_affect(n_instr *n){
-  parcours_var(n->u.affecte_.var);
-  parcours_exp(n->u.affecte_.exp); 
+	if(showIntel){
+		
+	}
+	
+	parcours_var(n->u.affecte_.var);
+	parcours_exp(n->u.affecte_.exp); 
+	
+	if (showIntel){
+
+	}
 }
 
 /*-------------------------------------------------------------------------*/
@@ -101,6 +111,9 @@ void parcours_instr_retour(n_instr *n){
 
 void parcours_instr_ecrire(n_instr *n){
 	parcours_exp(n->u.ecrire_.expression);
+	if (showIntel){
+      printf("\tpop eax\n\tcall iprintLF\n");
+	}
 }
 
 /*-------------------------------------------------------------------------*/
@@ -210,7 +223,11 @@ void parcours_varDec(n_dec *n){
 	if((var_id >= 0) && (tabsymboles.tab[var_id].portee != portee) || (var_id == -1)){
 		ajouteIdentificateur(n->nom, portee, T_ENTIER, adresseLocaleCourante, 1);
 		adresseLocaleCourante += 4;
-		//afficheTabsymboles();
+		if(showIntel){
+			if(portee == P_VARIABLE_GLOBALE){
+				printf("\t%s resw 1\n", n->nom);
+			}
+		}
 	}else{
 		printf("Variable déjà declarée : %s\n", n->nom);
 	}
@@ -224,6 +241,11 @@ void parcours_tabDec(n_dec *n){
 	if((var_id >= 0) && (tabsymboles.tab[var_id].portee != portee) || (var_id == -1)){
 		ajouteIdentificateur(n->nom, portee, T_TABLEAU_ENTIER, adresseLocaleCourante, n->u.tabDec_.taille);
 		adresseLocaleCourante += 4*(n->u.tabDec_.taille);
+		if(showIntel){
+			if(portee == P_VARIABLE_GLOBALE){
+				printf("\t%s resd %d\n", n->nom,n->u.tabDec_.taille);
+			}
+		}
 	}else{
 		printf("Variable déjà declarée : %s\n", n->nom);
 	}
