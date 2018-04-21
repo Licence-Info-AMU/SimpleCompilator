@@ -8,6 +8,7 @@ extern int portee;
 extern int adresseLocaleCourante;
 extern int adresseArgumentCourant;
 int paramcpt;
+int ind_fonc=0;
 FILE * fp;
 
 /*-------------------------------------------------------------------------*/
@@ -27,10 +28,6 @@ void parcours_n_prog(n_prog *n){
 		fprintf(fp,"section .text\nglobal _start\n_start:\n\tcall main\n\tmov eax, 1\n\tint 0x80\nmain:\n");
 	}
 	parcours_l_dec(n->fonctions);
-	if(showIntel){
-		fprintf(fp,"ret\n");
-		printf("ret\n");
-	}
 	fclose(fp);
 }
 
@@ -72,8 +69,8 @@ void parcours_instr_si(n_instr *n){
 /*-------------------------------------------------------------------------*/
 
 void parcours_instr_tantque(n_instr *n){
-  parcours_exp(n->u.tantque_.test);
-  parcours_instr(n->u.tantque_.faire);
+	parcours_exp(n->u.tantque_.test);
+	parcours_instr(n->u.tantque_.faire);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -84,6 +81,7 @@ void parcours_instr_affect(n_instr *n){
 		parcours_var(n->u.affecte_.var);
 		parcours_exp(n->u.affecte_.exp); 
 		if (showIntel){
+			printf("\tpop ebx\n");
 			fprintf(fp, "\tpop ebx\n");
 			if(tabsymboles.tab[id].portee == P_VARIABLE_GLOBALE){
 				if(tabsymboles.tab[id].type == T_TABLEAU_ENTIER){
@@ -121,6 +119,10 @@ void parcours_appel(n_appel *n){
 
 void parcours_instr_retour(n_instr *n){
 	parcours_exp(n->u.retour_.expression);
+	if (showIntel){
+		printf("\tpop  eax\n\tmov [ebp + %d], eax\n",8+4*tabsymboles.tab[ind_fonc].complement);
+		fprintf(fp,"\tpop  eax\n\tmov [ebp + %d], eax\n",8+4*tabsymboles.tab[ind_fonc].complement);
+	}
 }
 
 /*-------------------------------------------------------------------------*/
@@ -128,8 +130,8 @@ void parcours_instr_retour(n_instr *n){
 void parcours_instr_ecrire(n_instr *n){
 	parcours_exp(n->u.ecrire_.expression);
 	if (showIntel){
-      printf("\tpop eax\n\tcall iprintLF\n");
-      fprintf(fp,"\tpop eax\n\tcall iprintLF\n");
+		printf("\tpop eax\n\tcall iprintLF\n");
+		fprintf(fp,"\tpop eax\n\tcall iprintLF\n");
 	}
 }
 
@@ -155,7 +157,22 @@ void parcours_exp(n_exp *n){
 /*-------------------------------------------------------------------------*/
 
 void parcours_varExp(n_exp *n){
-	parcours_var(n->u.var);  
+	int k = rechercheExecutable(n->u.var->nom);
+	if (k ==-1){
+		parcours_var(n->u.var);
+	} 
+	if (showIntel){
+		if(tabsymboles.tab[k].portee == P_ARGUMENT){
+			printf("\tmov ebx, [ebp + %d]\n\tpush ebx\n",4+4*tabsymboles.tab[ind_fonc].complement-tabsymboles.tab[k].adresse);
+			fprintf(fp,"\tmov ebx, [ebp + %d]\n\tpush ebx\n",4+4*tabsymboles.tab[ind_fonc].complement-tabsymboles.tab[k].adresse);
+		}else if (tabsymboles.tab[k].portee == P_VARIABLE_GLOBALE) {
+			printf("\tmov ebx, [v%s]\n\tpush ebx\n",n->u.var->nom);
+			fprintf(fp,"\tmov ebx, [v%s]\n\tpush ebx\n",n->u.var->nom);	
+		}else if (tabsymboles.tab[k].portee == P_VARIABLE_LOCALE){
+			printf("\tmov ebx, [ebp + %d]\n\tpush ebx\n",n->u.entier);
+			fprintf(fp,"\tmov ebx, [ebp - %d]\n\tpush ebx\n",4-tabsymboles.tab[ind_fonc].complement-tabsymboles.tab[k].adresse);
+		}
+	}
 }
 
 /*-------------------------------------------------------------------------*/
@@ -166,19 +183,38 @@ void parcours_opExp(n_exp *n){
 	if( n->u.opExp_.op2 != NULL ) {
 		parcours_exp(n->u.opExp_.op2);
 	} 
+	
+	if (showIntel){
+		if(n->u.opExp_.op == plus){
+			printf("\tpop ebx\n\tpop eax\n\tadd eax, ebx\n\tpush eax\n");
+			fprintf(fp, "\tpop ebx\n\tpop eax\n\tadd eax, ebx\n\tpush eax\n");
+		}else if(n->u.opExp_.op == moins){
+			printf("\tpop ebx\n\tpop eax\n\tsub eax, ebx\n\tpush eax\n");
+			fprintf(fp, "\tpop ebx\n\tpop eax\n\tsub eax, ebx\n\tpush eax\n");
+		}else if(n->u.opExp_.op == fois){
+			printf("\tpop ebx\n\tpop eax\n\timul ebx\n\tpush eax\n");
+			fprintf(fp, "\tpop ebx\n\tpop eax\n\timul ebx\n\tpush eax\n");
+		}else if(n->u.opExp_.op == divise){
+			printf("\tpop ebx\n\tpop eax\n\tdiv ebx\n\tpush eax\n");
+			fprintf(fp, "\tpop ebx\n\tpop eax\n\tdiv ebx\n\tpush eax\n");
+		}
+	}
 }
 
 /*-------------------------------------------------------------------------*/
 
 void parcours_intExp(n_exp *n){
-
+	if (showIntel){
+		printf("\tpush %d\n",n->u.entier);
+		fprintf(fp,"\tpush %d\n",n->u.entier);
+	}
 }
 
 /*-------------------------------------------------------------------------*/
 void parcours_lireExp(n_exp *n){
 	if (showIntel){
 		printf("\tmov eax, sinput\n\tcall readline\n\tmov eax, sinput\n\tcall atoi\n\tpush eax\n");
-		fprintf(fp,"\tmov eax, sinput\n\tcall readline\nmov eax, sinput\ncall atoi\npush eax\n");
+		fprintf(fp,"\tmov eax, sinput\n\tcall readline\n\tmov eax, sinput\n\tcall atoi\n\tpush eax\n");
 	}
 }
 
@@ -224,15 +260,23 @@ void parcours_foncDec(n_dec *n){
 		// Ajout de la fonction
 		paramcpt=0;
 		int id=ajouteIdentificateur(n->nom, portee, T_FONCTION, adresseLocaleCourante, 0);
+		ind_fonc=rechercheExecutable(n->nom);
 		entreeFonction();
+		if(showIntel){
+			printf("\tpush ebp\n\tmov ebp, esp\n");
+			fprintf(fp,"\tpush ebp\n\tmov ebp, esp\n");
+		}		
 		parcours_l_dec(n->u.foncDec_.param);
 		tabsymboles.tab[id].complement = paramcpt;
 		portee = P_VARIABLE_LOCALE;
 		parcours_l_dec(n->u.foncDec_.variables);
 		parcours_instr(n->u.foncDec_.corps);
 		sortieFonction(trace_tabsymb);
+		if(showIntel){
+			printf("\tpop ebp\n\tret\n");
+			fprintf(fp,"\tpop ebp\n\tret\n");
+		}
 	}
-
 }
 
 /*-------------------------------------------------------------------------*/
@@ -245,8 +289,8 @@ void parcours_varDec(n_dec *n){
 		adresseLocaleCourante += 4;
 		if(showIntel){
 			if(portee == P_VARIABLE_GLOBALE){
-				printf("\t%s resw 1\n", n->nom);
-				fprintf(fp,"\t%s resw 1\n", n->nom);
+				printf("\t%s resd 1\n", n->nom);
+				fprintf(fp,"\t%s resd 1\n", n->nom);
 			}
 		}
 	}else{
