@@ -3,6 +3,9 @@
 
 #include "syntabs.h"
 
+int trace_tabsymb;
+int showIntel;
+
 void parcours_n_prog(n_prog *n);
 
 void parcours_n_prog(n_prog *n);

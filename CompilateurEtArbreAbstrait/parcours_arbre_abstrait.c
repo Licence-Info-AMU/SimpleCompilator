@@ -8,16 +8,21 @@ extern int portee;
 extern int adresseLocaleCourante;
 extern int adresseArgumentCourant;
 int paramcpt;
-int trace_tabsymb = 0;
 
 /*-------------------------------------------------------------------------*/
 
 void parcours_n_prog(n_prog *n){
+	if(showIntel){
+		printf("global _start\n_start:\ncall main\nmov eax, 1 ; 1 est le code de SYS_EXIT\nint 0x80 ; exit\nmain:\n");
+	}
 	portee = P_VARIABLE_GLOBALE;
 	adresseLocaleCourante = 0;
 	adresseArgumentCourant = 0;
 	parcours_l_dec(n->variables);
-	parcours_l_dec(n->fonctions); 
+	parcours_l_dec(n->fonctions);
+	if(showIntel){
+		printf("ret\n");
+	}
 }
 
 /*-------------------------------------------------------------------------*/
@@ -204,7 +209,7 @@ void parcours_varDec(n_dec *n){
 	if((var_id >= 0) && (tabsymboles.tab[var_id].portee != portee) || (var_id == -1)){
 		ajouteIdentificateur(n->nom, portee, T_ENTIER, adresseLocaleCourante, 1);
 		adresseLocaleCourante += 4;
-		afficheTabsymboles();
+		//afficheTabsymboles();
 	}else{
 		printf("Variable déjà declarée : %s\n", n->nom);
 	}
