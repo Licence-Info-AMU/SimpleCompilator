@@ -8,6 +8,7 @@ extern int portee;
 extern int adresseLocaleCourante;
 extern int adresseArgumentCourant;
 int paramcpt;
+FILE * fp;
 
 /*-------------------------------------------------------------------------*/
 
@@ -15,17 +16,22 @@ void parcours_n_prog(n_prog *n){
 	portee = P_VARIABLE_GLOBALE;
 	adresseLocaleCourante = 0;
 	adresseArgumentCourant = 0;
+	fp = fopen ("test.asm", "w+");
 	if(showIntel){
-		printf("\n%%include \"io.asm\"\nsection .bss\nsinput: resb 255\n");	
+		printf("\n%%include \"io.asm\"\nsection .bss\n");	
+		fprintf(fp,"%%include \"io.asm\"\nsection .bss\n");
 	}
 	parcours_l_dec(n->variables);
 	if(showIntel){
 		printf("global _start\n_start:\ncall main\nmov eax, 1 ; 1 est le code de SYS_EXIT\nint 0x80 ; exit\nmain:\n");
+		fprintf(fp,"global _start\n_start:\ncall main\nmov eax, 1 ; 1 est le code de SYS_EXIT\nint 0x80 ; exit\nmain:\n");
 	}
 	parcours_l_dec(n->fonctions);
 	if(showIntel){
+		fprintf(fp,"ret\n");
 		printf("ret\n");
 	}
+	fclose(fp);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -113,6 +119,7 @@ void parcours_instr_ecrire(n_instr *n){
 	parcours_exp(n->u.ecrire_.expression);
 	if (showIntel){
       printf("\tpop eax\n\tcall iprintLF\n");
+      fprintf(fp,"\tpop eax\n\tcall iprintLF\n");
 	}
 }
 
@@ -159,7 +166,10 @@ void parcours_intExp(n_exp *n){
 
 /*-------------------------------------------------------------------------*/
 void parcours_lireExp(n_exp *n){
-
+	if (showIntel){
+      printf("\tpop eax\n\tcall readline\n");
+      fprintf(fp,"\tpop eax\n\tcall readline\n");
+	}
 }
 
 /*-------------------------------------------------------------------------*/
@@ -226,6 +236,7 @@ void parcours_varDec(n_dec *n){
 		if(showIntel){
 			if(portee == P_VARIABLE_GLOBALE){
 				printf("\t%s resw 1\n", n->nom);
+				fprintf(fp,"\t%s resw 1\n", n->nom);
 			}
 		}
 	}else{
@@ -244,6 +255,7 @@ void parcours_tabDec(n_dec *n){
 		if(showIntel){
 			if(portee == P_VARIABLE_GLOBALE){
 				printf("\t%s resd %d\n", n->nom,n->u.tabDec_.taille);
+				fprintf(fp,"\t%s resd %d\n", n->nom,n->u.tabDec_.taille);
 			}
 		}
 	}else{
