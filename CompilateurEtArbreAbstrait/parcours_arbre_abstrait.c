@@ -11,6 +11,7 @@ int adresseGlobaleCourante = 0;
 int paramcpt;
 int ind_fonc=0;
 int cpt_label = 0;
+int local_cnt = 0;
 FILE * fp;
 
 /*-------------------------------------------------------------------------*/
@@ -30,6 +31,10 @@ void parcours_n_prog(n_prog *n){
 		fprintf(fp,"section .text\nglobal _start\n_start:\n\tcall main\n\tmov eax, 1\n\tint 0x80\n");
 	}
 	parcours_l_dec(n->fonctions);
+	if(showIntel){
+		printf("\tpop ebp\n\tret\n");
+		fprintf(fp,"\tpop ebp\n\tret\n");
+	}
 	fclose(fp);
 }
 
@@ -63,18 +68,18 @@ void parcours_instr(n_instr *n){
 void parcours_instr_si(n_instr *n){  
 	char debut[64], suite[64], sinon[64];
 	if(showIntel){
-		sprintf(debut,"e%d",cpt_label++);
+		//sprintf(debut,"e%d",cpt_label++);
 		sprintf(suite,"e%d",cpt_label++);	
+		sprintf(sinon,"e%d",cpt_label++);	
 	}
 	parcours_exp(n->u.si_.test);
 	if (showIntel){
-		printf("\tpop eax\n\tcmp eax, 0\n\tje %s\n",sinon);
-		fprintf(fp,"\tpop eax\n\tcmp eax, 0\n\tje %s\n",sinon);
+		printf("\tpop eax\n\tcmp eax, 0\n\tjz %s\n",sinon);
+		fprintf(fp,"\tpop eax\n\tcmp eax, 0\n\tjz %s\n",sinon);
 	}
 	parcours_instr(n->u.si_.alors);
 	if(n->u.si_.sinon){
 		if (showIntel){
-			sprintf(sinon,"e%d",cpt_label++);
 			printf("\tjmp %s\n",suite); 
 			fprintf(fp,"\tjmp %s\n",suite);
 			printf("%s:\n",sinon);
@@ -122,15 +127,20 @@ void parcours_instr_affect(n_instr *n){
 			fprintf(fp, "\tpop ebx\n");
 			if(tabsymboles.tab[id].portee == P_VARIABLE_GLOBALE){
 				if(tabsymboles.tab[id].type == T_TABLEAU_ENTIER){
-					printf("\tpop eax\n\timul eax, 4\n\tmov[%s + eax], ebx\n",n->u.affecte_.var->nom);
-					fprintf(fp, "\tpop eax\n\timul eax, 4\n\tmov[%s + eax], ebx\n",n->u.affecte_.var->nom);
+					printf("\tpop eax\n\timul eax, 4\n\tmov[v%s + eax], ebx\n",n->u.affecte_.var->nom);
+					fprintf(fp, "\tpop eax\n\timul eax, 4\n\tmov[v%s + eax], ebx\n",n->u.affecte_.var->nom);
 				}else{
 					printf("\tmov [v%s], ebx\n",n->u.affecte_.var->nom);
 					fprintf(fp, "\tmov [v%s], ebx\n",n->u.affecte_.var->nom);
 				}
 			}else if (tabsymboles.tab[id].portee == P_VARIABLE_LOCALE){
-				printf("\tmov [ebp %d], ebx\n",-4-tabsymboles.tab[id].adresse);
-				fprintf(fp, "\tmov [ebp %d], ebx\n",-4-tabsymboles.tab[id].adresse);
+				 if(tabsymboles.tab[id].type == T_TABLEAU_ENTIER){
+					printf("\tpop\teax\n\tadd\teax, eax\n\tadd\teax, eax\n\tpop ebx\n\tmov [v%s + eax], ebx\n",n->u.affecte_.var->nom);
+					fprintf(fp, "\tpop\teax\n\tadd\teax, eax\n\tadd\teax, eax\n\tpop ebx\n\tmov [v%s + eax], ebx\n",n->u.affecte_.var->nom);
+				}else{
+					printf("\tmov [ebp - %d], ebx\n",4+tabsymboles.tab[id].adresse);
+					fprintf(fp, "\tmov [ebp - %d], ebx\n",4+tabsymboles.tab[id].adresse);
+				}
 			}
 		}
 	}	
@@ -139,14 +149,28 @@ void parcours_instr_affect(n_instr *n){
 /*-------------------------------------------------------------------------*/
 
 void parcours_instr_appel(n_instr *n){
-  parcours_appel(n->u.appel); 
+	parcours_appel(n->u.appel); 
+	if (showIntel){
+		printf("\tadd esp, 4\n"); // Alloc valeur de retour
+		fprintf(fp,"\tadd esp, 4\n");
+	}
 }
 /*-------------------------------------------------------------------------*/
 
 void parcours_appel(n_appel *n){
 	int fonc_id = rechercheExecutable(n->fonction);
 	if (fonc_id >= 0){
-		parcours_l_exp(n->args);  				
+		if (showIntel){
+			printf("\tsub esp, 4\n");
+			fprintf(fp, "\tsub esp, 4\n"); // Alloc valeur de retour
+			printf("\tcall %s\n",n->fonction);
+			fprintf(fp,"\tcall %s\n",n->fonction);
+		}
+		parcours_l_exp(n->args);  	
+		if (showIntel){
+			printf("\tadd esp, %d\n", (tabsymboles.tab[fonc_id].complement == 0? 1: tabsymboles.tab[fonc_id].complement)*4);
+			fprintf(fp,"\tadd esp, %d\n", (tabsymboles.tab[fonc_id].complement == 0? 1: tabsymboles.tab[fonc_id].complement)*4);
+		}		
 	}else{
 		printf("Nom de fonction inconnue : %s\n", n->fonction);
 	}
@@ -159,6 +183,8 @@ void parcours_instr_retour(n_instr *n){
 	if (showIntel){
 		printf("\tpop  eax\n\tmov [ebp + %d], eax\n",8+4*tabsymboles.tab[ind_fonc].complement);
 		fprintf(fp,"\tpop  eax\n\tmov [ebp + %d], eax\n",8+4*tabsymboles.tab[ind_fonc].complement);
+		printf("\tpop ebp\n\tret\n");
+		fprintf(fp,"\tpop ebp\n\tret\n");
 	}
 }
 
@@ -198,16 +224,24 @@ void parcours_varExp(n_exp *n){
 	if (k ==-1){
 		parcours_var(n->u.var);
 	} 
+
 	if (showIntel){
 		if(tabsymboles.tab[k].portee == P_ARGUMENT){
 			printf("\tmov ebx, [ebp + %d]\n\tpush ebx\n",4+4*tabsymboles.tab[ind_fonc].complement-tabsymboles.tab[k].adresse);
 			fprintf(fp,"\tmov ebx, [ebp + %d]\n\tpush ebx\n",4+4*tabsymboles.tab[ind_fonc].complement-tabsymboles.tab[k].adresse);
 		}else if (tabsymboles.tab[k].portee == P_VARIABLE_GLOBALE) {
-			printf("\tmov ebx, [v%s]\n\tpush ebx\n",n->u.var->nom);
-			fprintf(fp,"\tmov ebx, [v%s]\n\tpush ebx\n",n->u.var->nom);	
+			if(tabsymboles.tab[k].type == T_TABLEAU_ENTIER){
+				printf("\tmov ebx, [ebp - %d]\n\tpush\tebx\n",4*tabsymboles.tab[ind_fonc].complement-tabsymboles.tab[k].adresse);
+				fprintf(fp,"\tmov ebx, [ebp - %d]\n\tpush\tebx\n",4*tabsymboles.tab[ind_fonc].complement-tabsymboles.tab[k].adresse);	
+				printf("\tpop\teax\n\tadd\teax, eax\n\tadd\teax, eax\n\tmov ebx, [v%s + eax]\n\tpush\tebx\n",n->u.var->nom);
+				fprintf(fp,"\tpop\teax\n\tadd\teax, eax\n\tadd\teax, eax\n\tmov ebx, [v%s + eax]\n\tpush\tebx\n",n->u.var->nom);
+			}else{
+				printf("\tmov ebx, [v%s]\n\tpush ebx\n",n->u.var->nom);
+				fprintf(fp,"\tmov ebx, [v%s]\n\tpush ebx\n",n->u.var->nom);	
+			}
 		}else if (tabsymboles.tab[k].portee == P_VARIABLE_LOCALE){
-			printf("\tmov ebx, [ebp - %d]\n\tpush ebx\n",4-tabsymboles.tab[k].adresse);
-			fprintf(fp,"\tmov ebx, [ebp - %d]\n\tpush ebx\n",4-tabsymboles.tab[k].adresse);
+			printf("\tmov ebx, [ebp - %d]\n\tpush ebx\n",4+tabsymboles.tab[k].adresse);
+			fprintf(fp,"\tmov ebx, [ebp - %d]\n\tpush ebx\n",4+tabsymboles.tab[k].adresse);
 		}
 	}
 }
@@ -215,14 +249,16 @@ void parcours_varExp(n_exp *n){
 /*-------------------------------------------------------------------------*/
 void parcours_opExp(n_exp *n){
 	char debut[64], suite[64], sinon[64];
-	if (n->u.opExp_.op == ou || n->u.opExp_.op == et || n->u.opExp_.op == non){
-		sprintf(debut,"e%d",cpt_label++);
-	}
-	if (n->u.opExp_.op == egal || n->u.opExp_.op == inferieur){
-		sprintf(sinon,"e%d",cpt_label++);
-	}
-	if (n->u.opExp_.op == egal || n->u.opExp_.op == inferieur || n->u.opExp_.op == ou || n->u.opExp_.op == et || n->u.opExp_.op == non){
-		sprintf(suite,"e%d",cpt_label++);
+	if (showIntel){
+		if (n->u.opExp_.op == ou || n->u.opExp_.op == et || n->u.opExp_.op == non){
+			sprintf(debut,"e%d",cpt_label++);
+		}
+		if (n->u.opExp_.op == egal || n->u.opExp_.op == inferieur){
+			sprintf(sinon,"e%d",cpt_label++);
+		}
+		if (n->u.opExp_.op == egal || n->u.opExp_.op == inferieur || n->u.opExp_.op == ou || n->u.opExp_.op == et || n->u.opExp_.op == non){
+			sprintf(suite,"e%d",cpt_label++);
+		}
 	}
 	
 	if( n->u.opExp_.op1 != NULL ) {
@@ -333,13 +369,18 @@ void parcours_foncDec(n_dec *n){
 		parcours_l_dec(n->u.foncDec_.param);
 		tabsymboles.tab[id].complement = paramcpt;
 		portee = P_VARIABLE_LOCALE;
-		parcours_l_dec(n->u.foncDec_.variables);
-		parcours_instr(n->u.foncDec_.corps);
-		sortieFonction(trace_tabsymb);
-		if(showIntel){
-			printf("\tpop ebp\n\tret\n");
-			fprintf(fp,"\tpop ebp\n\tret\n");
+		local_cnt = 0;
+		parcours_l_dec(n->u.foncDec_.variables);	
+		if ((showIntel) && (local_cnt > 0)){
+			printf("\tsub esp, %d\n", local_cnt);
+			fprintf(fp,"\tsub esp, %d\n", local_cnt);
 		}
+		parcours_instr(n->u.foncDec_.corps);
+		if ((showIntel) && (local_cnt > 0)){
+			printf("\tadd esp, %d\n", local_cnt);
+			fprintf(fp,"\tadd esp, %d\n", local_cnt);
+		}
+		sortieFonction(trace_tabsymb);
 	}
 }
 
@@ -353,6 +394,7 @@ void parcours_varDec(n_dec *n){
 		if (portee == P_VARIABLE_LOCALE){
 			adresse = adresseLocaleCourante;
 			adresseLocaleCourante += 4;
+			local_cnt+=4;
 		}else if (portee == P_ARGUMENT){
 			adresse = adresseArgumentCourant;
 			adresseArgumentCourant += 4;
