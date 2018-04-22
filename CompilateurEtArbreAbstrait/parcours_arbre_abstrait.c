@@ -7,6 +7,7 @@
 extern int portee;
 extern int adresseLocaleCourante;
 extern int adresseArgumentCourant;
+int adresseGlobaleCourante = 0;
 int paramcpt;
 int ind_fonc=0;
 FILE * fp;
@@ -24,8 +25,8 @@ void parcours_n_prog(n_prog *n){
 	}
 	parcours_l_dec(n->variables);
 	if(showIntel){
-		printf("section .text\nglobal _start\n_start:\n\tcall main\n\tmov eax, 1\n\tint 0x80\nmain:\n");
-		fprintf(fp,"section .text\nglobal _start\n_start:\n\tcall main\n\tmov eax, 1\n\tint 0x80\nmain:\n");
+		printf("section .text\nglobal _start\n_start:\n\tcall main\n\tmov eax, 1\n\tint 0x80\n");
+		fprintf(fp,"section .text\nglobal _start\n_start:\n\tcall main\n\tmov eax, 1\n\tint 0x80\n");
 	}
 	parcours_l_dec(n->fonctions);
 	fclose(fp);
@@ -169,8 +170,8 @@ void parcours_varExp(n_exp *n){
 			printf("\tmov ebx, [v%s]\n\tpush ebx\n",n->u.var->nom);
 			fprintf(fp,"\tmov ebx, [v%s]\n\tpush ebx\n",n->u.var->nom);	
 		}else if (tabsymboles.tab[k].portee == P_VARIABLE_LOCALE){
-			printf("\tmov ebx, [ebp + %d]\n\tpush ebx\n",n->u.entier);
-			fprintf(fp,"\tmov ebx, [ebp - %d]\n\tpush ebx\n",4-tabsymboles.tab[ind_fonc].complement-tabsymboles.tab[k].adresse);
+			printf("\tmov ebx, [ebp - %d]\n\tpush ebx\n",4-tabsymboles.tab[k].adresse);
+			fprintf(fp,"\tmov ebx, [ebp - %d]\n\tpush ebx\n",4-tabsymboles.tab[k].adresse);
 		}
 	}
 }
@@ -263,8 +264,8 @@ void parcours_foncDec(n_dec *n){
 		ind_fonc=rechercheExecutable(n->nom);
 		entreeFonction();
 		if(showIntel){
-			printf("\tpush ebp\n\tmov ebp, esp\n");
-			fprintf(fp,"\tpush ebp\n\tmov ebp, esp\n");
+			printf("%s:\n\tpush ebp\n\tmov ebp, esp\n",n->nom);
+			fprintf(fp,"%s:\n\tpush ebp\n\tmov ebp, esp\n",n->nom);
 		}		
 		parcours_l_dec(n->u.foncDec_.param);
 		tabsymboles.tab[id].complement = paramcpt;
@@ -284,15 +285,23 @@ void parcours_foncDec(n_dec *n){
 void parcours_varDec(n_dec *n){
 	int var_id = rechercheDeclarative(n->nom); // On cherche si "nom" existe deja
 	// Verifier qu'elles n'ont pas la meme portee
-	if((var_id >= 0) && (tabsymboles.tab[var_id].portee != portee) || (var_id == -1)){
-		ajouteIdentificateur(n->nom, portee, T_ENTIER, adresseLocaleCourante, 1);
-		adresseLocaleCourante += 4;
-		if(showIntel){
-			if(portee == P_VARIABLE_GLOBALE){
+	if((var_id >= 0) && (tabsymboles.tab[var_id].portee != portee) || (var_id == -1)){	
+		int adresse = 0;
+		if (portee == P_VARIABLE_LOCALE){
+			adresse = adresseLocaleCourante;
+			adresseLocaleCourante += 4;
+		}else if (portee == P_ARGUMENT){
+			adresse = adresseArgumentCourant;
+			adresseArgumentCourant += 4;
+		}else{
+			adresse = adresseGlobaleCourante;
+			adresseGlobaleCourante += 4;
+			if(showIntel){
 				printf("\t%s resd 1\n", n->nom);
 				fprintf(fp,"\t%s resd 1\n", n->nom);
 			}
 		}
+		ajouteIdentificateur(n->nom, portee, T_ENTIER, adresse, 1);
 	}else{
 		printf("Variable déjà declarée : %s\n", n->nom);
 	}
@@ -304,14 +313,22 @@ void parcours_tabDec(n_dec *n){
 	int var_id = rechercheDeclarative(n->nom);
 	// Verifier qu'elles n'ont pas la meme portee
 	if((var_id >= 0) && (tabsymboles.tab[var_id].portee != portee) || (var_id == -1)){
-		ajouteIdentificateur(n->nom, portee, T_TABLEAU_ENTIER, adresseLocaleCourante, n->u.tabDec_.taille);
-		adresseLocaleCourante += 4*(n->u.tabDec_.taille);
-		if(showIntel){
-			if(portee == P_VARIABLE_GLOBALE){
+		int adresse = 0;
+		if (portee == P_VARIABLE_LOCALE){
+			  adresse = adresseLocaleCourante;
+			  adresseLocaleCourante += 4*(n->u.tabDec_.taille);
+		}else if (portee == P_ARGUMENT){
+			  adresse = adresseArgumentCourant;
+			  adresseArgumentCourant += 4*(n->u.tabDec_.taille);
+		}else{
+			adresse = adresseGlobaleCourante;
+			adresseGlobaleCourante += 4*(n->u.tabDec_.taille);
+			if(showIntel){
 				printf("\t%s resd %d\n", n->nom,n->u.tabDec_.taille);
 				fprintf(fp,"\t%s resd %d\n", n->nom,n->u.tabDec_.taille);
 			}
-		}
+		}	
+		ajouteIdentificateur(n->nom, portee, T_TABLEAU_ENTIER, adresse, n->u.tabDec_.taille);
 	}else{
 		printf("Variable déjà declarée : %s\n", n->nom);
 	}
