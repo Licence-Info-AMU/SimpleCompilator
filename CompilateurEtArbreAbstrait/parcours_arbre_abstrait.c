@@ -10,6 +10,7 @@ extern int adresseArgumentCourant;
 int adresseGlobaleCourante = 0;
 int paramcpt;
 int ind_fonc=0;
+int cpt_label = 0;
 FILE * fp;
 
 /*-------------------------------------------------------------------------*/
@@ -178,9 +179,16 @@ void parcours_varExp(n_exp *n){
 
 /*-------------------------------------------------------------------------*/
 void parcours_opExp(n_exp *n){
+	if (showIntel){
+		char debut[64], suite[64], sinon[64];
+		sprintf(debut,"e%d",cpt_label++);
+		sprintf(suite,"e%d",cpt_label++);
+		sprintf(sinon,"e%d",cpt_label++);
+	}
 	if( n->u.opExp_.op1 != NULL ) {
 		parcours_exp(n->u.opExp_.op1);
 	}
+	
 	if( n->u.opExp_.op2 != NULL ) {
 		parcours_exp(n->u.opExp_.op2);
 	} 
@@ -198,6 +206,21 @@ void parcours_opExp(n_exp *n){
 		}else if(n->u.opExp_.op == divise){
 			printf("\tpop ebx\n\tpop eax\n\tdiv ebx\n\tpush eax\n");
 			fprintf(fp, "\tpop ebx\n\tpop eax\n\tdiv ebx\n\tpush eax\n");
+		}else if(n->u.opExp_.op == egal){	
+			printf("\tpop ebx\n\tpop eax\n\tcmp eax, ebx\n\tje %s\n\tpush 0\n\tjmp %s\n%s:\n\tpush 1\n%s:\n",sinon,suite,sinon,suite);
+			fprintf(fp, "\tpop ebx\n\tpop eax\n\tcmp eax, ebx\n\tje %s\n\tpush 0\n\tjmp %s\n%s:\n\tpush 1\n%s:\n",sinon,suite,sinon,suite);
+		}else if(n->u.opExp_.op == inferieur){
+			printf("\tpop ebx\n\tpop eax\n\tcmp eax, ebx\n\tjl %s\n\tpush 0\n\tjmp %s\n%s:\n\tpush 1\n%s:\n",sinon,suite,sinon,suite);
+			fprintf(fp, "\tpop ebx\n\tpop eax\n\tcmp eax, ebx\n\tjl %s\n\tpush 0\n\tjmp %s\n%s:\n\tpush 1\n%s:\n",sinon,suite,sinon,suite);
+		}else if(n->u.opExp_.op == ou){
+			printf("%s:\n\tpop ebx\n\tpop eax\n\tadd eax, ebx\n\tcmp eax, 0\n\tje %s\n push 1\n\tjmp %s\n\t%s:\n\tpush 0\n\t%s:\n",debut,debut,suite,debut,suite);
+			fprintf(fp, "%s:\n\tpop ebx\n\tpop eax\n\tadd eax, ebx\n\tcmp eax, 0\n\tje %s\n push 1\n\tjmp %s\n\t%s:\n\tpush 0\n\t%s:\n",debut,debut,suite,debut,suite);
+		}else if(n->u.opExp_.op == et){
+			printf("%s:\n\tpop ebx\n\tpop eax\n\timul eax, ebx\n\tcmp eax, 0\n\tje %s\n push 1\n\tjmp %s\n\t%s:\n\tpush 0\n\t%s:\n",debut,debut,suite,debut,suite);
+			fprintf(fp, "%s:\n\tpop ebx\n\tpop eax\n\timul eax, ebx\n\tcmp eax, 0\n\tje %s\n push 1\n\tjmp %s\n\t%s:\n\tpush 0\n\t%s:\n",debut,debut,suite,debut,suite);
+		}else if(n->u.opExp_.op == non){
+			printf("%s:\n\tpop eax\n\tcmp eax, 0\n\tje %s\n\tpush 0\n\tjmp %s\n%s:\n\tpush 1\n%s:",debut,debut,suite,debut,suite);
+			fprintf(fp, "%s:\n\tpop eax\n\tcmp eax, 0\n\tje %s\n\tpush 0\n\tjmp %s\n%s:\n\tpush 1\n%s:",debut,debut,suite,debut,suite);
 		}
 	}
 }
