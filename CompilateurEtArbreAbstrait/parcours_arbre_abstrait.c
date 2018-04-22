@@ -61,18 +61,53 @@ void parcours_instr(n_instr *n){
 /*-------------------------------------------------------------------------*/
 
 void parcours_instr_si(n_instr *n){  
+	char debut[64], suite[64], sinon[64];
+	if(showIntel){
+		sprintf(debut,"e%d",cpt_label++);
+		sprintf(suite,"e%d",cpt_label++);	
+	}
 	parcours_exp(n->u.si_.test);
+	if (showIntel){
+		printf("\tpop eax\n\tcmp eax, 0\n\tje %s\n",sinon);
+		fprintf(fp,"\tpop eax\n\tcmp eax, 0\n\tje %s\n",sinon);
+	}
 	parcours_instr(n->u.si_.alors);
 	if(n->u.si_.sinon){
+		if (showIntel){
+			sprintf(sinon,"e%d",cpt_label++);
+			printf("\tjmp %s\n",suite); 
+			fprintf(fp,"\tjmp %s\n",suite);
+			printf("%s:\n",sinon);
+			fprintf(fp,"%s:\n",sinon);
+		}
 		parcours_instr(n->u.si_.sinon);
+	}
+	if (showIntel){
+		printf("%s:\n",suite);
+		fprintf(fp,"%s:\n",suite);
 	}
 }
 
 /*-------------------------------------------------------------------------*/
 
 void parcours_instr_tantque(n_instr *n){
+	char debut[64], suite[64];
+	if (showIntel){
+		sprintf(debut,"e%d",cpt_label++);
+		sprintf(suite,"e%d",cpt_label++);
+		printf("%s:\n",debut);
+		fprintf(fp,"%s:\n",debut);
+	}
 	parcours_exp(n->u.tantque_.test);
+	if (showIntel){
+		printf("\tpop eax\n\tcmp eax, 0\n\tjz %s\n",suite);
+		fprintf(fp,"\tpop eax\n\tcmp eax, 0\n\tjz %s\n",suite);
+	}
 	parcours_instr(n->u.tantque_.faire);
+	if (showIntel){
+		printf("\tjmp %s\n%s:\n",debut,suite);
+		fprintf(fp,"\tjmp %s\n%s:\n",debut,suite); 
+	}
 }
 
 /*-------------------------------------------------------------------------*/
@@ -179,12 +214,17 @@ void parcours_varExp(n_exp *n){
 
 /*-------------------------------------------------------------------------*/
 void parcours_opExp(n_exp *n){
-	if (showIntel){
-		char debut[64], suite[64], sinon[64];
+	char debut[64], suite[64], sinon[64];
+	if (n->u.opExp_.op == ou || n->u.opExp_.op == et || n->u.opExp_.op == non){
 		sprintf(debut,"e%d",cpt_label++);
-		sprintf(suite,"e%d",cpt_label++);
+	}
+	if (n->u.opExp_.op == egal || n->u.opExp_.op == inferieur){
 		sprintf(sinon,"e%d",cpt_label++);
 	}
+	if (n->u.opExp_.op == egal || n->u.opExp_.op == inferieur || n->u.opExp_.op == ou || n->u.opExp_.op == et || n->u.opExp_.op == non){
+		sprintf(suite,"e%d",cpt_label++);
+	}
+	
 	if( n->u.opExp_.op1 != NULL ) {
 		parcours_exp(n->u.opExp_.op1);
 	}
@@ -320,8 +360,8 @@ void parcours_varDec(n_dec *n){
 			adresse = adresseGlobaleCourante;
 			adresseGlobaleCourante += 4;
 			if(showIntel){
-				printf("\t%s resd 1\n", n->nom);
-				fprintf(fp,"\t%s resd 1\n", n->nom);
+				printf("\tv%s resd 1\n", n->nom);
+				fprintf(fp,"\tv%s resd 1\n", n->nom);
 			}
 		}
 		ajouteIdentificateur(n->nom, portee, T_ENTIER, adresse, 1);
@@ -347,8 +387,8 @@ void parcours_tabDec(n_dec *n){
 			adresse = adresseGlobaleCourante;
 			adresseGlobaleCourante += 4*(n->u.tabDec_.taille);
 			if(showIntel){
-				printf("\t%s resd %d\n", n->nom,n->u.tabDec_.taille);
-				fprintf(fp,"\t%s resd %d\n", n->nom,n->u.tabDec_.taille);
+				printf("\tv%s resd %d\n", n->nom,n->u.tabDec_.taille);
+				fprintf(fp,"\tv%s resd %d\n", n->nom,n->u.tabDec_.taille);
 			}
 		}	
 		ajouteIdentificateur(n->nom, portee, T_TABLEAU_ENTIER, adresse, n->u.tabDec_.taille);
