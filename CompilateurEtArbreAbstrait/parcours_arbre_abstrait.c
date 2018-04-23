@@ -163,11 +163,11 @@ void parcours_appel(n_appel *n){
 		if (showIntel){
 			printf("\tsub esp, 4\n");
 			fprintf(fp, "\tsub esp, 4\n"); // Alloc valeur de retour
-			printf("\tcall %s\n",n->fonction);
-			fprintf(fp,"\tcall %s\n",n->fonction);
 		}
 		parcours_l_exp(n->args);  	
 		if (showIntel){
+			printf("\tcall %s\n",n->fonction);
+			fprintf(fp,"\tcall %s\n",n->fonction);
 			printf("\tadd esp, %d\n", (tabsymboles.tab[fonc_id].complement == 0? 1: tabsymboles.tab[fonc_id].complement)*4);
 			fprintf(fp,"\tadd esp, %d\n", (tabsymboles.tab[fonc_id].complement == 0? 1: tabsymboles.tab[fonc_id].complement)*4);
 		}		
