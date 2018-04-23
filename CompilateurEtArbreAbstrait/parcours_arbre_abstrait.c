@@ -8,7 +8,7 @@ extern int portee;
 extern int adresseLocaleCourante;
 extern int adresseArgumentCourant;
 int adresseGlobaleCourante = 0;
-int paramcpt;
+int paramcpt = 0;
 int ind_fonc=0;
 int cpt_label = 0;
 int local_cnt = 0;
@@ -66,16 +66,15 @@ void parcours_instr(n_instr *n){
 /*-------------------------------------------------------------------------*/
 
 void parcours_instr_si(n_instr *n){  
-	char debut[64], suite[64], sinon[64];
+	char suite[64], sinon[64];
 	if(showIntel){
-		//sprintf(debut,"e%d",cpt_label++);
 		sprintf(suite,"e%d",cpt_label++);	
 		sprintf(sinon,"e%d",cpt_label++);	
 	}
 	parcours_exp(n->u.si_.test);
 	if (showIntel){
-		printf("\tpop eax\n\tcmp eax, 0\n\tjz %s\n",sinon);
-		fprintf(fp,"\tpop eax\n\tcmp eax, 0\n\tjz %s\n",sinon);
+		printf("\tpop eax\n\tcmp eax, 0\n\tjz %s\n",suite);
+		fprintf(fp,"\tpop eax\n\tcmp eax, 0\n\tjz %s\n",suite);
 	}
 	parcours_instr(n->u.si_.alors);
 	if(n->u.si_.sinon){
