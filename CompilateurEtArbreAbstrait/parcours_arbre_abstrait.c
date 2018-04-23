@@ -31,10 +31,6 @@ void parcours_n_prog(n_prog *n){
 		fprintf(fp,"section .text\nglobal _start\n_start:\n\tcall main\n\tmov eax, 1\n\tint 0x80\n");
 	}
 	parcours_l_dec(n->fonctions);
-	if(showIntel){
-		printf("\tpop ebp\n\tret\n");
-		fprintf(fp,"\tpop ebp\n\tret\n");
-	}
 	fclose(fp);
 }
 
@@ -119,27 +115,24 @@ void parcours_instr_tantque(n_instr *n){
 void parcours_instr_affect(n_instr *n){
 	int id = rechercheExecutable(n->u.affecte_.var->nom);
 	if (id !=-1){
-		parcours_var(n->u.affecte_.var);
 		parcours_exp(n->u.affecte_.exp); 
+		parcours_var(n->u.affecte_.var);
 		if (showIntel){
-			printf("\tpop ebx\n");
-			fprintf(fp, "\tpop ebx\n");
+			if(tabsymboles.tab[id].type != T_TABLEAU_ENTIER) {
+				printf("\tpop ebx\n");
+				fprintf(fp, "\tpop ebx\n");
+			}
 			if(tabsymboles.tab[id].portee == P_VARIABLE_GLOBALE){
 				if(tabsymboles.tab[id].type == T_TABLEAU_ENTIER){
-					printf("\tpop eax\n\timul eax, 4\n\tmov[v%s + eax], ebx\n",n->u.affecte_.var->nom);
-					fprintf(fp, "\tpop eax\n\timul eax, 4\n\tmov[v%s + eax], ebx\n",n->u.affecte_.var->nom);
+					printf("\tpop\teax\n\tadd\teax, eax\n\tadd\teax, eax\n\tpop ebx\n\tmov [v%s + eax], ebx\n",n->u.affecte_.var->nom);
+					fprintf(fp,"\tpop\teax\n\tadd\teax, eax\n\tadd\teax, eax\n\tpop ebx\n\tmov [v%s + eax], ebx\n",n->u.affecte_.var->nom);
 				}else{
 					printf("\tmov [v%s], ebx\n",n->u.affecte_.var->nom);
 					fprintf(fp, "\tmov [v%s], ebx\n",n->u.affecte_.var->nom);
 				}
 			}else if (tabsymboles.tab[id].portee == P_VARIABLE_LOCALE){
-				 if(tabsymboles.tab[id].type == T_TABLEAU_ENTIER){
-					printf("\tpop\teax\n\tadd\teax, eax\n\tadd\teax, eax\n\tpop ebx\n\tmov [v%s + eax], ebx\n",n->u.affecte_.var->nom);
-					fprintf(fp, "\tpop\teax\n\tadd\teax, eax\n\tadd\teax, eax\n\tpop ebx\n\tmov [v%s + eax], ebx\n",n->u.affecte_.var->nom);
-				}else{
-					printf("\tmov [ebp - %d], ebx\n",4+tabsymboles.tab[id].adresse);
-					fprintf(fp, "\tmov [ebp - %d], ebx\n",4+tabsymboles.tab[id].adresse);
-				}
+				printf("\tmov [ebp - %d], ebx\n",4+tabsymboles.tab[id].adresse);
+				fprintf(fp, "\tmov [ebp - %d], ebx\n",4+tabsymboles.tab[id].adresse);
 			}
 		}
 	}	
@@ -167,8 +160,10 @@ void parcours_appel(n_appel *n){
 		if (showIntel){
 			printf("\tcall %s\n",n->fonction);
 			fprintf(fp,"\tcall %s\n",n->fonction);
-			printf("\tadd esp, %d\n", (tabsymboles.tab[fonc_id].complement == 0? 1: tabsymboles.tab[fonc_id].complement)*4);
-			fprintf(fp,"\tadd esp, %d\n", (tabsymboles.tab[fonc_id].complement == 0? 1: tabsymboles.tab[fonc_id].complement)*4);
+			if(tabsymboles.tab[fonc_id].complement > 0){
+				printf("\tadd esp, %d\n", (tabsymboles.tab[fonc_id].complement == 0? 1: tabsymboles.tab[fonc_id].complement)*4);
+				fprintf(fp,"\tadd esp, %d\n", (tabsymboles.tab[fonc_id].complement == 0? 1: tabsymboles.tab[fonc_id].complement)*4);
+			}
 		}		
 	}else{
 		printf("Nom de fonction inconnue : %s\n", n->fonction);
@@ -230,8 +225,9 @@ void parcours_varExp(n_exp *n){
 			fprintf(fp,"\tmov ebx, [ebp + %d]\n\tpush ebx\n",4+4*tabsymboles.tab[ind_fonc].complement-tabsymboles.tab[k].adresse);
 		}else if (tabsymboles.tab[k].portee == P_VARIABLE_GLOBALE) {
 			if(tabsymboles.tab[k].type == T_TABLEAU_ENTIER){
-				printf("\tmov ebx, [ebp - %d]\n\tpush\tebx\n",4*tabsymboles.tab[ind_fonc].complement-tabsymboles.tab[k].adresse);
-				fprintf(fp,"\tmov ebx, [ebp - %d]\n\tpush\tebx\n",4*tabsymboles.tab[ind_fonc].complement-tabsymboles.tab[k].adresse);	
+				parcours_exp( n->u.var->u.indicee_.indice );
+				//printf("\tmov ebx, [ebp - %d]\n\tpush\tebx\n",4*(tabsymboles.tab[ind_fonc].complement-tabsymboles.tab[k].adresse));
+				//fprintf(fp,"\tmov ebx, [ebp - %d]\n\tpush\tebx\n",4*(tabsymboles.tab[ind_fonc].complement-tabsymboles.tab[k].adresse));	
 				printf("\tpop\teax\n\tadd\teax, eax\n\tadd\teax, eax\n\tmov ebx, [v%s + eax]\n\tpush\tebx\n",n->u.var->nom);
 				fprintf(fp,"\tpop\teax\n\tadd\teax, eax\n\tadd\teax, eax\n\tmov ebx, [v%s + eax]\n\tpush\tebx\n",n->u.var->nom);
 			}else{
@@ -282,20 +278,20 @@ void parcours_opExp(n_exp *n){
 			printf("\tpop ebx\n\tpop eax\n\tdiv ebx\n\tpush eax\n");
 			fprintf(fp, "\tpop ebx\n\tpop eax\n\tdiv ebx\n\tpush eax\n");
 		}else if(n->u.opExp_.op == egal){	
-			printf("\tpop ebx\n\tpop eax\n\tcmp eax, ebx\n\tje %s\n\tpush 0\n\tjmp %s\n%s:\n\tpush 1\n%s:\n",sinon,suite,sinon,suite);
-			fprintf(fp, "\tpop ebx\n\tpop eax\n\tcmp eax, ebx\n\tje %s\n\tpush 0\n\tjmp %s\n%s:\n\tpush 1\n%s:\n",sinon,suite,sinon,suite);
+			printf("\tpop\tebx\n\tpop\teax\n\tcmp eax, ebx\n\tje\t%s\n\tpush\t0\n\tjmp %s\n%s:\n\tpush\t1\n%s:\n",sinon,suite,sinon,suite);
+			fprintf(fp, "\tpop\tebx\n\tpop\teax\n\tcmp eax, ebx\n\tje\t%s\n\tpush\t0\n\tjmp %s\n%s:\n\tpush\t1\n%s:\n",sinon,suite,sinon,suite);
 		}else if(n->u.opExp_.op == inferieur){
-			printf("\tpop ebx\n\tpop eax\n\tcmp eax, ebx\n\tjl %s\n\tpush 0\n\tjmp %s\n%s:\n\tpush 1\n%s:\n",sinon,suite,sinon,suite);
-			fprintf(fp, "\tpop ebx\n\tpop eax\n\tcmp eax, ebx\n\tjl %s\n\tpush 0\n\tjmp %s\n%s:\n\tpush 1\n%s:\n",sinon,suite,sinon,suite);
+			printf("\tpop\tebx\n\tpop\teax\n\tcmp eax, ebx\n\tjl\t%s\n\tpush\t0\n\tjmp %s\n%s:\n\tpush\t1\n%s:\n",sinon,suite,sinon,suite);
+			fprintf(fp, "\tpop\tebx\n\tpop\teax\n\tcmp eax, ebx\n\tjl\t%s\n\tpush\t0\n\tjmp %s\n%s:\n\tpush\t1\n%s:\n",sinon,suite,sinon,suite);
 		}else if(n->u.opExp_.op == ou){
-			printf("%s:\n\tpop ebx\n\tpop eax\n\tadd eax, ebx\n\tcmp eax, 0\n\tje %s\n push 1\n\tjmp %s\n\t%s:\n\tpush 0\n\t%s:\n",debut,debut,suite,debut,suite);
-			fprintf(fp, "%s:\n\tpop ebx\n\tpop eax\n\tadd eax, ebx\n\tcmp eax, 0\n\tje %s\n push 1\n\tjmp %s\n\t%s:\n\tpush 0\n\t%s:\n",debut,debut,suite,debut,suite);
+			printf("%s:\n\tpop\tebx\n\tpop\teax\n\tadd eax, ebx\n\tcmp eax, 0\n\tje %s\n push\t1\n\tjmp %s\n\t%s:\n\tpush\t0\n\t%s:\n",debut,debut,suite,debut,suite);
+			fprintf(fp, "%s:\n\tpop\tebx\n\tpop\teax\n\tadd eax, ebx\n\tcmp eax, 0\n\tje %s\n push\t1\n\tjmp %s\n\t%s:\n\tpush\t0\n\t%s:\n",debut,debut,suite,debut,suite);
 		}else if(n->u.opExp_.op == et){
-			printf("%s:\n\tpop ebx\n\tpop eax\n\timul eax, ebx\n\tcmp eax, 0\n\tje %s\n push 1\n\tjmp %s\n\t%s:\n\tpush 0\n\t%s:\n",debut,debut,suite,debut,suite);
-			fprintf(fp, "%s:\n\tpop ebx\n\tpop eax\n\timul eax, ebx\n\tcmp eax, 0\n\tje %s\n push 1\n\tjmp %s\n\t%s:\n\tpush 0\n\t%s:\n",debut,debut,suite,debut,suite);
+			printf("%s:\n\tpop\tebx\n\tpop\teax\n\timul eax, ebx\n\tcmp eax, 0\n\tje %s\n push\t1\n\tjmp %s\n\t%s:\n\tpush\t0\n\t%s:\n",debut,debut,suite,debut,suite);
+			fprintf(fp, "%s:\n\tpop\tebx\n\tpop\teax\n\timul eax, ebx\n\tcmp eax, 0\n\tje %s\n push\t1\n\tjmp %s\n\t%s:\n\tpush\t0\n\t%s:\n",debut,debut,suite,debut,suite);
 		}else if(n->u.opExp_.op == non){
 			printf("%s:\n\tpop eax\n\tcmp eax, 0\n\tje %s\n\tpush 0\n\tjmp %s\n%s:\n\tpush 1\n%s:",debut,debut,suite,debut,suite);
-			fprintf(fp, "%s:\n\tpop eax\n\tcmp eax, 0\n\tje %s\n\tpush 0\n\tjmp %s\n%s:\n\tpush 1\n%s:",debut,debut,suite,debut,suite);
+			fprintf(fp, "%s:\n\tpop\teax\n\tcmp eax, 0\n\tje %s\n\tpush\t0\n\tjmp %s\n%s:\n\tpush\t1\n%s:",debut,debut,suite,debut,suite);
 		}
 	}
 }
@@ -375,11 +371,15 @@ void parcours_foncDec(n_dec *n){
 			fprintf(fp,"\tsub esp, %d\n", local_cnt);
 		}
 		parcours_instr(n->u.foncDec_.corps);
-		if ((showIntel) && (local_cnt > 0)){
-			printf("\tadd esp, %d\n", local_cnt);
-			fprintf(fp,"\tadd esp, %d\n", local_cnt);
-		}
 		sortieFonction(trace_tabsymb);
+		if (showIntel){
+			if(local_cnt > 0){
+				printf("\tadd esp, %d\n", local_cnt);
+				fprintf(fp,"\tadd esp, %d\n", local_cnt);
+			}
+			printf("\tpop ebp\n\tret\n");
+			fprintf(fp,"\tpop ebp\n\tret\n");
+		}
 	}
 }
 
@@ -441,7 +441,6 @@ void parcours_tabDec(n_dec *n){
 /*-------------------------------------------------------------------------*/
 
 void parcours_var(n_var *n){
-	//printf("n->nom : %s\n n->type : %d\n simple : %d\n",n->nom,n->type,indicee);
 	if(n->type == simple) {
 		parcours_var_simple(n);
 	}else if(n->type == indicee) {
@@ -468,7 +467,7 @@ void parcours_var_indicee(n_var *n){
 		if(tabsymboles.tab[var_id].type != T_TABLEAU_ENTIER){
 			printf("Mauvais type (Tableau attendu) : %s\n", n->nom);
 		}else{
-			parcours_exp( n->u.indicee_.indice );
+			parcours_exp(n->u.indicee_.indice);
 		}
 	}else{
 		printf("Variable non declaree : %s\n", n->nom);
