@@ -354,6 +354,7 @@ void parcours_foncDec(n_dec *n){
 	}else{
 		// Ajout de la fonction
 		paramcpt=0;
+		adresseArgumentCourant = 0;
 		adresseLocaleCourante = 0;
 		int id=ajouteIdentificateur(n->nom, portee, T_FONCTION, adresseLocaleCourante, 0);
 		ind_fonc=rechercheExecutable(n->nom);
