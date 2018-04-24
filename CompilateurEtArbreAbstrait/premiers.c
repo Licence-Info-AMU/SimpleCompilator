@@ -101,6 +101,8 @@ void initialise_premiers(void){
 	premiers[_expression_][LIRE] = 1;
 	premiers[_expression_][NON] = 1;
 	premiers[_expression_][PARENTHESE_OUVRANTE] = 1;
+	//modif
+	premiers[_expression_][CARRE] = 1;
 	
 	//EXPB
 	premiers[_expressionBis_][OU] = 1;
@@ -114,6 +116,8 @@ void initialise_premiers(void){
 	premiers[_conjonction_][LIRE] = 1;
 	premiers[_conjonction_][NON] = 1;
 	premiers[_conjonction_][PARENTHESE_OUVRANTE] = 1;
+	//modif
+	premiers[_conjonction_][CARRE] = 1;
 	
 	//CONJB
 	premiers[_conjonctionBis_][ET] = 1;
@@ -126,6 +130,8 @@ void initialise_premiers(void){
 	premiers[_comparaison_][LIRE] = 1;
 	premiers[_comparaison_][PARENTHESE_OUVRANTE] = 1;
 	premiers[_comparaison_][NON] = 1;
+	//modif
+	premiers[_comparaison_][CARRE] = 1;
 	
 	//COMPB
 	premiers[_comparaisonBis_][EGAL] = 1;
@@ -139,6 +145,8 @@ void initialise_premiers(void){
 	premiers[_expArith_][LIRE] = 1;
 	premiers[_expArith_][NON] = 1;
 	premiers[_expArith_][PARENTHESE_OUVRANTE] = 1;
+	//modif
+	premiers[_expArith_][CARRE] = 1;
 	
 	//EB
 	premiers[_expArithBis_][PLUS] = 1;
@@ -152,6 +160,8 @@ void initialise_premiers(void){
 	premiers[_terme_][LIRE] = 1;
 	premiers[_terme_][NON] = 1;
 	premiers[_terme_][PARENTHESE_OUVRANTE] = 1;
+	//modif
+	premiers[_terme_][CARRE] = 1;
 	
 	//TB
 	premiers[_termeBis_][FOIS] = 1;
@@ -165,6 +175,8 @@ void initialise_premiers(void){
 	premiers[_negation_][LIRE] = 1;
 	premiers[_negation_][NON] = 1;
 	premiers[_negation_][PARENTHESE_OUVRANTE] = 1;
+	//modif
+	premiers[_negation_][CARRE] = 1;
 
 	//F
 	premiers[_facteur_][NOMBRE] = 1;
@@ -191,6 +203,8 @@ void initialise_premiers(void){
 	premiers[_listeExpressions_][LIRE] = 1;
 	premiers[_listeExpressions_][NON] = 1;
 	premiers[_listeExpressions_][PARENTHESE_OUVRANTE] = 1;
+	//modif
+	premiers[_listeExpressions_][CARRE] = 1;
 
 	//LEXPB
 	premiers[_listeExpressionsBis_][VIRGULE] = 1;

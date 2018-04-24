@@ -61,7 +61,7 @@ n_dec *cree_n_dec_fonc(char *nom, n_l_dec *param, n_l_dec *variables, n_instr *c
 
 /* ATTENTION : non => négation logique
    Le opérateurs unaires ont op2 = NULL par convention */
-typedef enum {plus, moins, fois, divise, egal, inferieur, ou, et, non} operation; 
+typedef enum {plus, moins, fois, divise, egal, inferieur, ou, et, non, carre} operation; 
 
 /* Expression arithmétique ou logique (opExp) ou atomique (varExp, intExp, 
    appelExp, lireExp) */

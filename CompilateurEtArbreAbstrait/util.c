@@ -165,6 +165,7 @@ void nom_token( int token, char *nom, char *valeur ) {
   else if(token == VIRGULE) strcpy(valeur, "VIRGULE");
   else if(token == INTERROGATION) strcpy(valeur, "INTERROGATION");
   else if(token == DEUXPOINTS) strcpy(valeur, "DEUXPOINTS");
+  else if(token == CARRE) strcpy(valeur, "CARRE");
 
   else if( token == ID_VAR ) {
     strcpy( nom, "id_variable" );  

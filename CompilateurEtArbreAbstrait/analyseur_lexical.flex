@@ -15,6 +15,7 @@ chiffre [0-9]
 nom [a-zA-Z0-9_$]*
 %%
 "\n"			   {  } /* Retours chariot */
+" " {} /*espace*/
 "#".*              {  } /* Commentaires */
 "/*".*"*/"              {  } /* Commentaires */
 "//".*              {  } /* Commentaires */
@@ -49,6 +50,7 @@ ecrire             { return ECRIRE ; }
 ","                { return VIRGULE ; }
 "?"                { return INTERROGATION; }
 ":"                { return DEUXPOINTS; }
+"^"					{ return CARRE; }
 <<EOF>>            { return FIN; }  /* Fin de fichier */
 %%
 int yywrap(){

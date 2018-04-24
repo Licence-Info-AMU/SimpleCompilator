@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "syntabs.h"
 #include "util.h"
 #include "tabsymboles.h"
@@ -32,6 +34,11 @@ void parcours_n_prog(n_prog *n){
 	}
 	parcours_l_dec(n->fonctions);
 	fclose(fp);
+	int k = rechercheExecutable("main");
+	if(k == -1){
+		printf("Pas de fonction main présente.");
+		exit(-1);
+	}
 }
 
 /*-------------------------------------------------------------------------*/
@@ -69,12 +76,12 @@ void parcours_instr_si(n_instr *n){
 	}
 	parcours_exp(n->u.si_.test);
 	if (showIntel){
-		printf("\tpop eax\n\tcmp eax, 0\n\tjz %s\n",suite);
-		fprintf(fp,"\tpop eax\n\tcmp eax, 0\n\tjz %s\n",suite);
+		printf("\tpop eax\n\tcmp eax, 0\n\tjz %s\n",(n->u.si_.sinon) ? sinon : suite);
+		fprintf(fp,"\tpop eax\n\tcmp eax, 0\n\tjz %s\n",(n->u.si_.sinon) ? sinon : suite);
 	}
 	parcours_instr(n->u.si_.alors);
 	if(n->u.si_.sinon){
-		if (showIntel){
+		if (showIntel){int k = rechercheExecutable("main");
 			printf("\tjmp %s\n",suite); 
 			fprintf(fp,"\tjmp %s\n",suite);
 			printf("%s:\n",sinon);
@@ -151,7 +158,19 @@ void parcours_instr_appel(n_instr *n){
 
 void parcours_appel(n_appel *n){
 	int fonc_id = rechercheExecutable(n->fonction);
-	if (fonc_id >= 0){
+	if (fonc_id != -1){	
+	  int nb_arg_declare = tabsymboles.tab[fonc_id].complement;
+		int nb_arg_utilise = 0;
+		n_l_exp *args = n->args;
+		while(args != NULL){
+		  ++nb_arg_utilise;
+		  args = args->queue;
+		}
+		if(nb_arg_declare != nb_arg_utilise){
+			printf("Mauvais nombre d'arguments! %d utilisés pour %d attendus", nb_arg_utilise, nb_arg_declare);
+			exit(-1);
+		}
+		
 		if (showIntel){
 			printf("\tsub esp, 4\n");
 			fprintf(fp, "\tsub esp, 4\n"); // Alloc valeur de retour
@@ -167,6 +186,7 @@ void parcours_appel(n_appel *n){
 		}		
 	}else{
 		printf("Nom de fonction inconnue : %s\n", n->fonction);
+		exit(-1);
 	}
 }
 
@@ -177,6 +197,10 @@ void parcours_instr_retour(n_instr *n){
 	if (showIntel){
 		printf("\tpop  eax\n\tmov [ebp + %d], eax\n",8+4*tabsymboles.tab[ind_fonc].complement);
 		fprintf(fp,"\tpop  eax\n\tmov [ebp + %d], eax\n",8+4*tabsymboles.tab[ind_fonc].complement);
+		if(local_cnt > 0){
+			printf("\tadd esp, %d\n",local_cnt);
+			fprintf(fp,"\tadd esp, %d\n",local_cnt);
+		}
 		printf("\tpop ebp\n\tret\n");
 		fprintf(fp,"\tpop ebp\n\tret\n");
 	}
@@ -226,8 +250,6 @@ void parcours_varExp(n_exp *n){
 		}else if (tabsymboles.tab[k].portee == P_VARIABLE_GLOBALE) {
 			if(tabsymboles.tab[k].type == T_TABLEAU_ENTIER){
 				parcours_exp( n->u.var->u.indicee_.indice );
-				//printf("\tmov ebx, [ebp - %d]\n\tpush\tebx\n",4*(tabsymboles.tab[ind_fonc].complement-tabsymboles.tab[k].adresse));
-				//fprintf(fp,"\tmov ebx, [ebp - %d]\n\tpush\tebx\n",4*(tabsymboles.tab[ind_fonc].complement-tabsymboles.tab[k].adresse));	
 				printf("\tpop\teax\n\tadd\teax, eax\n\tadd\teax, eax\n\tmov ebx, [v%s + eax]\n\tpush\tebx\n",n->u.var->nom);
 				fprintf(fp,"\tpop\teax\n\tadd\teax, eax\n\tadd\teax, eax\n\tmov ebx, [v%s + eax]\n\tpush\tebx\n",n->u.var->nom);
 			}else{
@@ -284,14 +306,17 @@ void parcours_opExp(n_exp *n){
 			printf("\tpop\tebx\n\tpop\teax\n\tcmp eax, ebx\n\tjl\t%s\n\tpush\t0\n\tjmp %s\n%s:\n\tpush\t1\n%s:\n",sinon,suite,sinon,suite);
 			fprintf(fp, "\tpop\tebx\n\tpop\teax\n\tcmp eax, ebx\n\tjl\t%s\n\tpush\t0\n\tjmp %s\n%s:\n\tpush\t1\n%s:\n",sinon,suite,sinon,suite);
 		}else if(n->u.opExp_.op == ou){
-			printf("%s:\n\tpop\tebx\n\tpop\teax\n\tadd eax, ebx\n\tcmp eax, 0\n\tje %s\n push\t1\n\tjmp %s\n\t%s:\n\tpush\t0\n\t%s:\n",debut,debut,suite,debut,suite);
-			fprintf(fp, "%s:\n\tpop\tebx\n\tpop\teax\n\tadd eax, ebx\n\tcmp eax, 0\n\tje %s\n push\t1\n\tjmp %s\n\t%s:\n\tpush\t0\n\t%s:\n",debut,debut,suite,debut,suite);
+			printf("\tpop\tebx\n\tpop\teax\n\tadd eax, ebx\n\tcmp eax, 0\n\tje %s\n push\t1\n\tjmp %s\n\t%s:\n\tpush\t0\n\t%s:\n",debut,suite,debut,suite);
+			fprintf(fp, "\tpop\tebx\n\tpop\teax\n\tadd eax, ebx\n\tcmp eax, 0\n\tje %s\n push\t1\n\tjmp %s\n\t%s:\n\tpush\t0\n\t%s:\n",debut,suite,debut,suite);
 		}else if(n->u.opExp_.op == et){
-			printf("%s:\n\tpop\tebx\n\tpop\teax\n\timul eax, ebx\n\tcmp eax, 0\n\tje %s\n push\t1\n\tjmp %s\n\t%s:\n\tpush\t0\n\t%s:\n",debut,debut,suite,debut,suite);
-			fprintf(fp, "%s:\n\tpop\tebx\n\tpop\teax\n\timul eax, ebx\n\tcmp eax, 0\n\tje %s\n push\t1\n\tjmp %s\n\t%s:\n\tpush\t0\n\t%s:\n",debut,debut,suite,debut,suite);
+			printf("\tpop\tebx\n\tpop\teax\n\timul eax, ebx\n\tcmp eax, 0\n\tje %s\n push\t1\n\tjmp %s\n\t%s:\n\tpush\t0\n\t%s:\n",debut,suite,debut,suite);
+			fprintf(fp, "\tpop\tebx\n\tpop\teax\n\timul eax, ebx\n\tcmp eax, 0\n\tje %s\n push\t1\n\tjmp %s\n\t%s:\n\tpush\t0\n\t%s:\n",debut,suite,debut,suite);
 		}else if(n->u.opExp_.op == non){
-			printf("%s:\n\tpop eax\n\tcmp eax, 0\n\tje %s\n\tpush 0\n\tjmp %s\n%s:\n\tpush 1\n%s:",debut,debut,suite,debut,suite);
-			fprintf(fp, "%s:\n\tpop\teax\n\tcmp eax, 0\n\tje %s\n\tpush\t0\n\tjmp %s\n%s:\n\tpush\t1\n%s:",debut,debut,suite,debut,suite);
+			printf("\tpop eax\n\tcmp eax, 0\n\tje %s\n\tpush 0\n\tjmp %s\n%s:\n\tpush 1\n%s:",debut,suite,debut,suite);
+			fprintf(fp, "\tpop eax\n\tcmp eax, 0\n\tje %s\n\tpush\t0\n\tjmp %s\n%s:\n\tpush\t1\n%s:",debut,suite,debut,suite);
+		}else if(n->u.opExp_.op == carre){
+			printf("\tpop eax\n\timul eax\n\tpush eax\n");
+			fprintf(fp,"\tpop eax\n\timul eax\n\tpush eax\n");
 		}
 	}
 }
@@ -349,9 +374,7 @@ void parcours_dec(n_dec *n){
 
 void parcours_foncDec(n_dec *n){
 	int fonc_id = rechercheDeclarative(n->nom);
-	if (fonc_id >= 0){
-		printf("Nom de fonction deja utilise : %s\n", n->nom);
-	}else{
+	if (fonc_id == -1){
 		// Ajout de la fonction
 		paramcpt=0;
 		adresseArgumentCourant = 0;
@@ -382,6 +405,9 @@ void parcours_foncDec(n_dec *n){
 			printf("\tpop ebp\n\tret\n");
 			fprintf(fp,"\tpop ebp\n\tret\n");
 		}
+	}else{
+		printf("Nom de fonction deja utilise : %s\n", n->nom);
+		exit(-1);
 	}
 }
 
@@ -390,7 +416,7 @@ void parcours_foncDec(n_dec *n){
 void parcours_varDec(n_dec *n){
 	int var_id = rechercheDeclarative(n->nom); // On cherche si "nom" existe deja
 	// Verifier qu'elles n'ont pas la meme portee
-	if((var_id >= 0) && (tabsymboles.tab[var_id].portee != portee) || (var_id == -1)){	
+	if(var_id == -1){	
 		int adresse = 0;
 		if (portee == P_VARIABLE_LOCALE){
 			adresse = adresseLocaleCourante;
@@ -410,39 +436,42 @@ void parcours_varDec(n_dec *n){
 		ajouteIdentificateur(n->nom, portee, T_ENTIER, adresse, 1);
 	}else{
 		printf("Variable déjà declarée : %s\n", n->nom);
+		exit(-1);
 	}
 }
 
 /*-------------------------------------------------------------------------*/
 
 void parcours_tabDec(n_dec *n){
-	int var_id = rechercheDeclarative(n->nom);
-	// Verifier qu'elles n'ont pas la meme portee
-	if((var_id >= 0) && (tabsymboles.tab[var_id].portee != portee) || (var_id == -1)){
-		int adresse = 0;
-		if (portee == P_VARIABLE_LOCALE){
-			  adresse = adresseLocaleCourante;
-			  adresseLocaleCourante += 4*(n->u.tabDec_.taille);
-		}else if (portee == P_ARGUMENT){
-			  adresse = adresseArgumentCourant;
-			  adresseArgumentCourant += 4*(n->u.tabDec_.taille);
-		}else{
-			adresse = adresseGlobaleCourante;
-			adresseGlobaleCourante += 4*(n->u.tabDec_.taille);
-			if(showIntel){
-				printf("\tv%s resd %d\n", n->nom,n->u.tabDec_.taille);
-				fprintf(fp,"\tv%s resd %d\n", n->nom,n->u.tabDec_.taille);
-			}
-		}	
-		ajouteIdentificateur(n->nom, portee, T_TABLEAU_ENTIER, adresse, n->u.tabDec_.taille);
-	}else{
-		printf("Variable déjà declarée : %s\n", n->nom);
-	}
+  int k = rechercheDeclarative(n->nom);
+  if(k == -1){
+    if(portee == P_VARIABLE_GLOBALE){
+      ajouteIdentificateur(n->nom, portee, n->type, adresseGlobaleCourante, n->u.tabDec_.taille);
+      adresseLocaleCourante += 4 * (n->u.tabDec_.taille);
+      if(showIntel){
+			printf("\tv%s resd %d\n", n->nom,n->u.tabDec_.taille);
+			fprintf(fp,"\tv%s resd %d\n", n->nom,n->u.tabDec_.taille);
+      }
+    }
+    else{
+      printf("Un tableau ne peut être déclaré qu'en tant que variable globale!");
+      exit(-1);
+    }
+  }
+  else{
+    printf("Variable %s déja déclarée!", n->nom);
+    exit(-1);
+  }
 }
 
 /*-------------------------------------------------------------------------*/
 
 void parcours_var(n_var *n){
+	int k = rechercheExecutable(n->nom);
+	if(k == -1){
+		printf("La variable %s n'existe pas!", n->nom);
+		exit(-1);
+	}
 	if(n->type == simple) {
 		parcours_var_simple(n);
 	}else if(n->type == indicee) {
@@ -452,27 +481,19 @@ void parcours_var(n_var *n){
 
 /*-------------------------------------------------------------------------*/
 void parcours_var_simple(n_var *n){
-	int var_id = rechercheExecutable(n->nom); // On cherche si "nom" existe
-	if (var_id >= 0){ // Si on trouve var_id
-		if(tabsymboles.tab[var_id].type != T_ENTIER){
-			printf("Mauvais type (Entier attendu) : %s\n ", n->nom);
-		}
-	}else{
-		printf("Variable non declaree : %s\n", n->nom);
-	}
+  int k = rechercheExecutable(n->nom);
+  if(tabsymboles.tab[k].type == T_TABLEAU_ENTIER){
+    printf("La variable %s, déclarée en tant que tableau, est utilisée en tant que variable simple!", n->nom);
+    exit(-1);
+  }
 }
-
 /*-------------------------------------------------------------------------*/
 void parcours_var_indicee(n_var *n){
-	int var_id = rechercheExecutable(n->nom); // On cherche si "nom" existe
-	if (var_id >= 0){ // Si on trouve var_id
-		if(tabsymboles.tab[var_id].type != T_TABLEAU_ENTIER){
-			printf("Mauvais type (Tableau attendu) : %s\n", n->nom);
-		}else{
-			parcours_exp(n->u.indicee_.indice);
-		}
-	}else{
-		printf("Variable non declaree : %s\n", n->nom);
-	}
+  int k = rechercheExecutable(n->nom);
+  if(tabsymboles.tab[k].type == T_ENTIER){
+    printf("La variable %s, déclarée en tant que variable simple, est utilisée en tant que tableau!", n->nom);
+    exit(-1);
+  }
+  parcours_exp( n->u.indicee_.indice );
 }
 /*-------------------------------------------------------------------------*/

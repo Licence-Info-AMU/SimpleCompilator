@@ -571,11 +571,16 @@ n_exp * termeBis(n_exp * herite){										//TB
 n_exp * negation(){										//NEG
 	n_exp * op = NULL;
 	n_exp * neg = NULL;
+	n_exp * car = NULL;
 	affiche_balise_ouvrante(__FUNCTION__, trace_xml);
 	if(uniteCourante==NON){
 		consommer(NON,&uniteCourante,trace_xml);
 		neg=negation();
 		op = cree_n_exp_op(non,neg,NULL);
+	}else if(uniteCourante==CARRE){
+		consommer(CARRE,&uniteCourante,trace_xml);
+		car=negation();
+		op = cree_n_exp_op(carre,car,NULL);
 	}else if(est_premier_uniteCourante(_facteur_)){
 		op = facteur();
 	}else{
