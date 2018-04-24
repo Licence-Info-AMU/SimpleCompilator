@@ -142,6 +142,9 @@ void parcours_instr_affect(n_instr *n){
 				fprintf(fp, "\tmov [ebp - %d], ebx\n",4+tabsymboles.tab[id].adresse);
 			}
 		}
+	}else{
+		printf("variable n'existe pas !\n");
+		exit(-1);
 	}	
 }
 
@@ -241,7 +244,7 @@ void parcours_varExp(n_exp *n){
 	int k = rechercheExecutable(n->u.var->nom);
 	if (k ==-1){
 		parcours_var(n->u.var);
-	} 
+	}
 
 	if (showIntel){
 		if(tabsymboles.tab[k].portee == P_ARGUMENT){
@@ -491,11 +494,11 @@ void parcours_var_simple(n_var *n){
 }
 /*-------------------------------------------------------------------------*/
 void parcours_var_indicee(n_var *n){
-  int k = rechercheExecutable(n->nom);
-  if(tabsymboles.tab[k].type == T_ENTIER){
-    printf("La variable %s, déclarée en tant que variable simple, est utilisée en tant que tableau!", n->nom);
-    exit(-1);
-  }
-  parcours_exp( n->u.indicee_.indice );
+	int k = rechercheExecutable(n->nom);
+	if(tabsymboles.tab[k].type == T_ENTIER){
+		printf("La variable %s, déclarée en tant que variable simple, est utilisée en tant que tableau!", n->nom);
+		exit(-1);
+	}
+	parcours_exp( n->u.indicee_.indice );
 }
 /*-------------------------------------------------------------------------*/
