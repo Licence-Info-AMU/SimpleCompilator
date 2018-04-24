@@ -433,7 +433,7 @@ void parcours_varDec(n_dec *n){
 				fprintf(fp,"\tv%s resd 1\n", n->nom);
 			}
 		}
-		ajouteIdentificateur(n->nom, portee, T_ENTIER, adresse, 1);
+		ajouteIdentificateur(n->nom, portee, n->type, adresse, 1);
 	}else{
 		printf("Variable déjà declarée : %s\n", n->nom);
 		exit(-1);
@@ -467,16 +467,18 @@ void parcours_tabDec(n_dec *n){
 /*-------------------------------------------------------------------------*/
 
 void parcours_var(n_var *n){
-	int k = rechercheExecutable(n->nom);
-	if(k == -1){
-		printf("La variable %s n'existe pas!", n->nom);
-		exit(-1);
-	}
-	if(n->type == simple) {
-		parcours_var_simple(n);
-	}else if(n->type == indicee) {
-		parcours_var_indicee(n);
-	}
+  int k = rechercheExecutable(n->nom);
+  if(k == -1){
+    printf("La variable %s n'existe pas!", n->nom);
+    exit(-1);
+  }else{
+    if(n->type == simple) {
+      parcours_var_simple(n);
+    }
+    else if(n->type == indicee) {
+      parcours_var_indicee(n);
+    }
+  }
 }
 
 /*-------------------------------------------------------------------------*/
